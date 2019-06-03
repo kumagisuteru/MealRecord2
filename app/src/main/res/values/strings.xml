@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">MealRecord</string>
+    <string name="bt_record">記録</string>
+    <string name="dialog_title">記録確認</string>
+    <string name="dialog_msg">指定された数値で記録を行います。よろしいですか？</string>
+    <string name="dialog_btn_ok">はい</string>
+    <string name="dialog_btn_ng">いいえ</string>
+    <string name="dialog_ng_toast">記録をキャンセルしました</string>
+    <string name="record_thxA">記録お疲れ様です。\n食べ過ぎたようですね、次の食事を減らしたり運動をしたりしてはどうでしょうか。</string>
+    <string name="record_thxB">記録お疲れ様です。\n食事量をコントロールできていますね。今後も腹8分目を意識していきましょう。</string>
+
+</resources>
