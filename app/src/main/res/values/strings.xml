@@ -8,5 +8,10 @@
     <string name="dialog_ng_toast">記録をキャンセルしました</string>
     <string name="record_thxA">記録お疲れ様です。\n食べ過ぎたようですね、次の食事を減らしたり運動をしたりしてはどうでしょうか。</string>
     <string name="record_thxB">記録お疲れ様です。\n食事量をコントロールできていますね。今後も腹8分目を意識していきましょう。</string>
+    <string name="txt_fullness">満腹度</string>
+    <string name="bt_delete">削除</string>
+    <string name="hint">input</string>
+    <string name="bt_return">戻る</string>
+    <string name="bt_List">リスト</string>
 
 </resources>

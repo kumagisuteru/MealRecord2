@@ -1,7 +1,10 @@
 package com.websarva.wings.android.mealrecord;
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.icu.text.SimpleDateFormat;
 import android.location.LocationListener;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +16,16 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.util.Date;
+
 public class MainActivity extends AppCompatActivity {
+
+    com.websarva.wings.android.mealrecord.DataBaseHelper helper;
+    private SQLiteDatabase db;
+    private Date date;
+    private String stdate;
+    private String category;
+    private int score;
 
 
     @Override
@@ -29,8 +41,11 @@ public class MainActivity extends AppCompatActivity {
         final ImageView faceScaleImageView = (ImageView) findViewById(R.id.Face_image);
 
         Button btrecord =findViewById(R.id.bt_record);
+        Button btList =findViewById(R.id.bt_List);
 
-
+        //データベース取得
+        helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(this);
+        db = helper.getReadableDatabase();
 
         //シークバー
         Mscoretex.setText("満腹度:"+seekM.getProgress());
@@ -89,6 +104,15 @@ public class MainActivity extends AppCompatActivity {
                 // OKボタン押下時の処理
                // Log.d("AlertDialog", "Positive which :" + which);
 
+                date = new Date();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                stdate = sdf.format(date);
+                category = "満腹度";
+
+                score = seekM.getProgress();
+                //日付時刻と文字列をデータベースに記録
+                insertData(db, stdate, category, score);
+
                 //完了画面表示
                 Intent intent = new Intent(getApplication(), Recordfin_Activity.class);
                 startActivity(intent);
@@ -114,8 +138,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                Intent intent = new Intent(getApplication(), ShowList.class);
+                startActivity(intent);
+            }
+        });
 
+    }
 
+    public void insertData(SQLiteDatabase db, String dat, String cat, int val) {
+
+        ContentValues values = new ContentValues();
+        values.put("datetime", dat);
+        values.put("category", cat);
+        values.put("value", val);
+
+        db.insert("mrdb", null, values);
     }
 }
