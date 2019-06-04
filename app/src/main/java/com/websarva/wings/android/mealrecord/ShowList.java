@@ -7,16 +7,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.content.Intent;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ShowList extends AppCompatActivity {
 
     //変数宣言
     private EditText editText;
-    private TextView textView;
+    private ListView listView;
     com.websarva.wings.android.mealrecord.DataBaseHelper helper;
     private SQLiteDatabase db;
     private String category;
@@ -33,7 +41,7 @@ public class ShowList extends AppCompatActivity {
         btnBack.setOnClickListener(btnTap);
         Button btnDelete = findViewById(R.id.bt_delete);
         btnDelete.setOnClickListener(btnTap);
-        textView = findViewById(R.id.txt_List);
+        listView = findViewById(R.id.list_view);
         editText = findViewById(R.id.et_Num);
 
         //データベース取得
@@ -107,13 +115,29 @@ public class ShowList extends AppCompatActivity {
         //カーソルを一番上に戻す
         cursor.moveToFirst();
 
-        StringBuilder sbuilder = new StringBuilder();
+        //StringBuilder sbuilder = new StringBuilder();
+        StringBuilder sb1 = new StringBuilder();
+        String date;
 
-
+        //ArrayList data = new ArrayList<>();
+        List<Map<String, String>> data = new ArrayList<Map<String, String>>();
         //抽出したデータのも実を表示するための変数に格納
         //表示形式↓↓↓
         // ID: 年/日/月 時:分:秒: カテゴリ名: 値
         for (int i = 0; i < cursor.getCount(); i++) {
+            Map<String, String> item = new HashMap<String, String>();
+            sb1.append(cursor.getString(2));
+            sb1.append(": ");
+            sb1.append(cursor.getInt(3));
+            date = cursor.getString(1);
+            item.put("Subject", sb1.toString());
+            item.put("Comment", date);
+            data.add(item);
+            sb1.delete(0, sb1.length());
+            cursor.moveToNext();
+
+
+            /*
             sbuilder.append(cursor.getInt(0));
             sbuilder.append(": ");
             sbuilder.append(cursor.getString(1));
@@ -121,17 +145,28 @@ public class ShowList extends AppCompatActivity {
             sbuilder.append(cursor.getString(2));
             sbuilder.append(": ");
             sbuilder.append(cursor.getInt(3));
-            sbuilder.append("\n");
             cursor.moveToNext();
+            data.add(sbuilder.toString());
+            sbuilder.delete(0, sbuilder.length());
+            */
         }
 
         // 忘れずに！
         cursor.close();
 
+        /*
+        ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, data);
         Log.d("debug","**********"+sbuilder.toString());
+        */
+        // リスト項目とListViewを対応付けるArrayAdapterを用意する
+        SimpleAdapter adapter = new SimpleAdapter(this, data,
+                android.R.layout.simple_list_item_2,
+                new String[] { "Subject", "Comment" },
+                new int[] { android.R.id.text1, android.R.id.text2});
 
-        //テキストビューに文字列代入
-        textView.setText(sbuilder.toString());
+        //リストビューに文字列代入
+        listView.setAdapter(adapter);
+        //listView.setText(sbuilder.toString());
     }
 
     //画面を再読み込みする関数
