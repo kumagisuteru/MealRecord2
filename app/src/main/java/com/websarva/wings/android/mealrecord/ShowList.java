@@ -14,6 +14,7 @@ import android.content.Intent;
 
 public class ShowList extends AppCompatActivity {
 
+    //変数宣言
     private EditText editText;
     private TextView textView;
     com.websarva.wings.android.mealrecord.DataBaseHelper helper;
@@ -27,6 +28,7 @@ public class ShowList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_list);
 
+        //レイアウト取得
         Button btnBack = findViewById(R.id.bt_return);
         btnBack.setOnClickListener(btnTap);
         Button btnDelete = findViewById(R.id.bt_delete);
@@ -38,6 +40,7 @@ public class ShowList extends AppCompatActivity {
         helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(this);
         db = helper.getReadableDatabase();
 
+        //画面遷移時に表示するために、onCreate内でデータベースの表示を行う
         readData("満腹度");
 
 
@@ -55,15 +58,19 @@ public class ShowList extends AppCompatActivity {
             if (db == null) {
                 db = helper.getWritableDatabase();
             }
+
+            //ボタン押下時の処理
             switch (view.getId()) {
+                //戻るボタン
                 case R.id.bt_return:
                     finish();
                     break;
 
-                //読み込みボタンの処理
+                //削除ボタンの処理
                 case R.id.bt_delete:
-                    //テキストボックスに入力された数値に該当するIDのデータを削除
+                    //テキストボックスの数値を取得
                     delId = editText.getText().toString();
+                    //テキストボックスに入力された数値に該当するIDのデータを削除
                     db.delete("mrdb", "_id = ?", new String[]{delId});
                     //画面の更新をする
                     reload();
@@ -71,6 +78,8 @@ public class ShowList extends AppCompatActivity {
             }
         }
     };
+
+    //データベースを読み込み文字列変換し表示する関数
     public void readData(String cat){
 
         Log.d("debug","**********Cursor");
@@ -120,9 +129,12 @@ public class ShowList extends AppCompatActivity {
         cursor.close();
 
         Log.d("debug","**********"+sbuilder.toString());
+
+        //テキストビューに文字列代入
         textView.setText(sbuilder.toString());
     }
 
+    //画面を再読み込みする関数
     private void reload() {
         intent = getIntent();
         overridePendingTransition(0, 0);

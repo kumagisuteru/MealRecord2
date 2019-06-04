@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+//データベースの変更を行いたいときに編集
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 

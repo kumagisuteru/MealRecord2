@@ -20,6 +20,7 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
+    //変数宣言
     com.websarva.wings.android.mealrecord.DataBaseHelper helper;
     private SQLiteDatabase db;
     private Date date;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //ここから追記
-
+        //レイアウトアイテム取得
         final SeekBar seekM = (SeekBar) findViewById(R.id.seekBar_Meal);
         final TextView Mscoretex = (TextView) findViewById(R.id.Meal_score);
         final ImageView faceScaleImageView = (ImageView) findViewById(R.id.Face_image);
@@ -104,11 +105,16 @@ public class MainActivity extends AppCompatActivity {
                 // OKボタン押下時の処理
                // Log.d("AlertDialog", "Positive which :" + which);
 
+                //OKボタン押下時の日付取得
                 date = new Date();
+                //日付表記を変更
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                //string型に変換
                 stdate = sdf.format(date);
+                //categoryに満腹度を代入
+                //複数のカテゴリがある場合、レイアウト等から該当するカテゴリを取ってきて代入
                 category = "満腹度";
-
+                //シークバーの数値を取ってくる
                 score = seekM.getProgress();
                 //日付時刻と文字列をデータベースに記録
                 insertData(db, stdate, category, score);
@@ -149,6 +155,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //データベースに記録する関数
+    //引数は データベース,日付文字列,カテゴリ,数値
     public void insertData(SQLiteDatabase db, String dat, String cat, int val) {
 
         ContentValues values = new ContentValues();
@@ -156,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
         values.put("category", cat);
         values.put("value", val);
 
+        //mrdbという名前のデータベースに保存
         db.insert("mrdb", null, values);
     }
 }

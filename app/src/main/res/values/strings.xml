@@ -13,5 +13,6 @@
     <string name="hint">input</string>
     <string name="bt_return">戻る</string>
     <string name="bt_List">リスト</string>
+    <string name="bt_Graph">グラフ</string>
 
 </resources>
