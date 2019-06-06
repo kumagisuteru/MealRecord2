@@ -1,12 +1,15 @@
 package com.websarva.wings.android.mealrecord;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +17,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.content.Intent;
+import android.widget.Toast;
+import android.widget.TwoLineListItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +35,7 @@ public class ShowList extends AppCompatActivity {
     private String category;
     private String  delId;
     private Intent intent;
+    SimpleAdapter simpleAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +45,7 @@ public class ShowList extends AppCompatActivity {
         //レイアウト取得
         Button btnBack = findViewById(R.id.bt_return);
         btnBack.setOnClickListener(btnTap);
-        Button btnDelete = findViewById(R.id.bt_delete);
-        btnDelete.setOnClickListener(btnTap);
         listView = findViewById(R.id.list_view);
-        editText = findViewById(R.id.et_Num);
 
         //データベース取得
         helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(this);
@@ -50,6 +53,56 @@ public class ShowList extends AppCompatActivity {
 
         //画面遷移時に表示するために、onCreate内でデータベースの表示を行う
         readData("満腹度");
+
+
+        //リスト項目を長押しした時の処理
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            /**
+             * @param parent ListView
+             * @param view 選択した項目
+             * @param position 選択した項目の添え字
+             * @param id 選択した項目のID
+             */
+            public boolean onItemLongClick(AdapterView<?> parent, final View view, final int position, long id) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ShowList.this);
+                builder.setTitle(getString(R.string.dialog_title))
+                        .setMessage("削除しますか？")
+                        .setPositiveButton("おｋ", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                // 選択されたビューを取得 TwoLineListItemを取得した後、text2の値を取得する
+                                TwoLineListItem two = (TwoLineListItem) view;
+                                TextView idTextView = (TextView) two.getText2();
+                                String delId = (String) idTextView.getText();
+
+                                // 長押しした項目をデータベースから削除
+                                SQLiteDatabase db = helper.getWritableDatabase();
+                                try {
+                                    db.delete("mrdb", "datetime = ?", new String[]{delId});
+                                } finally {
+                                    db.close();
+                                }
+
+                                // remove item from ArrayList
+                                //memoList.remove(position);
+                                // update ListView
+                                simpleAdapter.notifyDataSetChanged();
+                                reload();
+                                //Toast.makeText(ShowList.this, "削除しました", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setNegativeButton("んｇ", null)
+                        .setCancelable(true);
+                // show dialog
+                builder.show();
+
+                // trueにすることで通常のクリックイベントを発生させない
+                return true;
+
+            }
+        });
 
 
     }
@@ -74,15 +127,6 @@ public class ShowList extends AppCompatActivity {
                     finish();
                     break;
 
-                //削除ボタンの処理
-                case R.id.bt_delete:
-                    //テキストボックスの数値を取得
-                    delId = editText.getText().toString();
-                    //テキストボックスに入力された数値に該当するIDのデータを削除
-                    db.delete("mrdb", "_id = ?", new String[]{delId});
-                    //画面の更新をする
-                    reload();
-                    break;
             }
         }
     };
@@ -169,6 +213,8 @@ public class ShowList extends AppCompatActivity {
         //listView.setText(sbuilder.toString());
     }
 
+
+
     //画面を再読み込みする関数
     private void reload() {
         intent = getIntent();
@@ -180,3 +226,4 @@ public class ShowList extends AppCompatActivity {
         startActivity(intent);
     }
 }
+

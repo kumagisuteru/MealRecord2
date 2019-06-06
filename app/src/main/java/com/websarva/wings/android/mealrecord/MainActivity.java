@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button btrecord =findViewById(R.id.bt_record);
         Button btList =findViewById(R.id.bt_List);
+        Button btGraph= findViewById(R.id.bt_Graph);
 
         //データベース取得
         helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(this);
@@ -149,6 +150,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Intent intent = new Intent(getApplication(), ShowList.class);
+                startActivity(intent);
+            }
+        });
+        btGraph.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(getApplication(), ShowGraph.class);
                 startActivity(intent);
             }
         });
