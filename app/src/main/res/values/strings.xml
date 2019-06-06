@@ -1,18 +1,22 @@
 <resources>
     <string name="app_name">MealRecord</string>
-    <string name="bt_record">記録</string>
+    <string name="btn_record">記録</string>
     <string name="dialog_title">記録確認</string>
+    <string name="txt_finTitle">記録完了</string>
     <string name="dialog_msg">指定された数値で記録を行います。よろしいですか？</string>
-    <string name="dialog_btn_ok">はい</string>
-    <string name="dialog_btn_ng">いいえ</string>
+    <string name="dialog_positive">はい</string>
+    <string name="dialog_negative">いいえ</string>
     <string name="dialog_ng_toast">記録をキャンセルしました</string>
+    <string name="dialog_delete">削除します。よろしいですか？</string>
+    <string name="dialog_deleted">削除しました。</string>
     <string name="record_thxA">記録お疲れ様です。\n食べ過ぎたようですね、次の食事を減らしたり運動をしたりしてはどうでしょうか。</string>
     <string name="record_thxB">記録お疲れ様です。\n食事量をコントロールできていますね。今後も腹8分目を意識していきましょう。</string>
     <string name="txt_fullness">満腹度</string>
-    <string name="bt_delete">削除</string>
+    <string name="btn_delete">削除</string>
     <string name="hint">input</string>
-    <string name="bt_return">戻る</string>
-    <string name="bt_List">リスト</string>
-    <string name="bt_Graph">グラフ</string>
-
+    <string name="btn_return">戻る</string>
+    <string name="btn_list">リスト</string>
+    <string name="btn_graph">グラフ</string>
+    <string name="btn_show">表示</string>
+    <string name="txt_category">満腹度</string>
 </resources>

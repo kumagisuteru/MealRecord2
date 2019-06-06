@@ -28,7 +28,6 @@ import java.util.Map;
 public class ShowList extends AppCompatActivity {
 
     //変数宣言
-    private EditText editText;
     private ListView listView;
     com.websarva.wings.android.mealrecord.DataBaseHelper helper;
     private SQLiteDatabase db;
@@ -43,7 +42,7 @@ public class ShowList extends AppCompatActivity {
         setContentView(R.layout.activity_show_list);
 
         //レイアウト取得
-        Button btnBack = findViewById(R.id.bt_return);
+        Button btnBack = findViewById(R.id.btn_return);
         btnBack.setOnClickListener(btnTap);
         listView = findViewById(R.id.list_view);
 
@@ -52,7 +51,8 @@ public class ShowList extends AppCompatActivity {
         db = helper.getReadableDatabase();
 
         //画面遷移時に表示するために、onCreate内でデータベースの表示を行う
-        readData("満腹度");
+        category = "満腹度";
+        readData(category);
 
 
         //リスト項目を長押しした時の処理
@@ -67,33 +67,33 @@ public class ShowList extends AppCompatActivity {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(ShowList.this);
                 builder.setTitle(getString(R.string.dialog_title))
-                        .setMessage("削除しますか？")
-                        .setPositiveButton("おｋ", new DialogInterface.OnClickListener() {
+                        .setMessage(R.string.dialog_delete)
+                        .setPositiveButton(R.string.dialog_positive, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
                                 // 選択されたビューを取得 TwoLineListItemを取得した後、text2の値を取得する
                                 TwoLineListItem two = (TwoLineListItem) view;
                                 TextView idTextView = (TextView) two.getText2();
-                                String delId = (String) idTextView.getText();
+                                delId = (String) idTextView.getText();
 
                                 // 長押しした項目をデータベースから削除
-                                SQLiteDatabase db = helper.getWritableDatabase();
-                                try {
+                               // SQLiteDatabase db = helper.getWritableDatabase();
+                                //try {
                                     db.delete("mrdb", "datetime = ?", new String[]{delId});
-                                } finally {
-                                    db.close();
-                                }
+                                //} finally {
+                                //    db.close();
+                               // }
 
                                 // remove item from ArrayList
                                 //memoList.remove(position);
                                 // update ListView
-                                simpleAdapter.notifyDataSetChanged();
+                                //simpleAdapter.notifyDataSetChanged();
                                 reload();
-                                //Toast.makeText(ShowList.this, "削除しました", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ShowList.this, R.string.dialog_deleted, Toast.LENGTH_SHORT).show();
                             }
                         })
-                        .setNegativeButton("んｇ", null)
+                        .setNegativeButton(R.string.dialog_negative, null)
                         .setCancelable(true);
                 // show dialog
                 builder.show();
@@ -123,7 +123,7 @@ public class ShowList extends AppCompatActivity {
             //ボタン押下時の処理
             switch (view.getId()) {
                 //戻るボタン
-                case R.id.bt_return:
+                case R.id.btn_return:
                     finish();
                     break;
 
@@ -179,20 +179,6 @@ public class ShowList extends AppCompatActivity {
             data.add(item);
             sb1.delete(0, sb1.length());
             cursor.moveToNext();
-
-
-            /*
-            sbuilder.append(cursor.getInt(0));
-            sbuilder.append(": ");
-            sbuilder.append(cursor.getString(1));
-            sbuilder.append(": ");
-            sbuilder.append(cursor.getString(2));
-            sbuilder.append(": ");
-            sbuilder.append(cursor.getInt(3));
-            cursor.moveToNext();
-            data.add(sbuilder.toString());
-            sbuilder.delete(0, sbuilder.length());
-            */
         }
 
         // 忘れずに！

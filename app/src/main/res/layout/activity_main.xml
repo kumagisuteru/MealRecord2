@@ -44,44 +44,44 @@
         android:layout_marginBottom="8dp"
         android:max="100"
         android:progress="50"
-        app:layout_constraintBottom_toTopOf="@+id/bt_record"
+        app:layout_constraintBottom_toTopOf="@+id/btn_record"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Meal_score" />
 
     <Button
-        android:id="@+id/bt_record"
+        android:id="@+id/btn_record"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/bt_record"
+        android:text="@string/btn_record"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/bt_Graph"
+        app:layout_constraintBottom_toTopOf="@+id/btn_graph"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/seekBar_Meal" />
 
     <Button
-        android:id="@+id/bt_Graph"
+        android:id="@+id/btn_graph"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:text="@string/bt_Graph"
+        android:text="@string/btn_graph"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/bt_List"
+        app:layout_constraintEnd_toStartOf="@+id/btn_list"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/bt_List"
+        android:id="@+id/btn_list"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_marginTop="8dp"
-        android:text="@string/bt_List"
+        android:text="@string/btn_list"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/bt_Graph"
-        app:layout_constraintTop_toBottomOf="@+id/bt_record"
+        app:layout_constraintStart_toEndOf="@+id/btn_graph"
+        app:layout_constraintTop_toBottomOf="@+id/btn_record"
         app:layout_constraintVertical_bias="1.0" />
 
 

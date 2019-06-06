@@ -28,7 +28,7 @@ public class Recordfin_Activity extends AppCompatActivity {
         //  }
 
         //戻るボタン
-        Button returnButton = findViewById(R.id.bt_return);
+        Button returnButton = findViewById(R.id.btn_return);
         returnButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

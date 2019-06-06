@@ -59,10 +59,8 @@ public class ShowGraph extends AppCompatActivity {
 
 
         // 戻るボタン・グラフ領域のオブジェクト取得
-        Button btnBack = findViewById(R.id.bt_return);
+        Button btnBack = findViewById(R.id.btn_return);
         btnBack.setOnClickListener(btnTap);
-        Button btnShow = findViewById(R.id.btn_Show);
-        btnShow.setOnClickListener(btnTap);
 
         mChart = findViewById(R.id.line_chart);
 
@@ -92,6 +90,19 @@ public class ShowGraph extends AppCompatActivity {
         // add data
         //setData();
 
+        if (helper == null) {
+            helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(getApplicationContext());
+        }
+
+        if (db == null) {
+            db = helper.getWritableDatabase();
+        }
+
+
+        valuearray = getvaluelist(category);
+        //グラフ表示
+        setList(valuearray);
+
         mChart.animateX(2500);
         //mChart.invalidate();
 
@@ -118,18 +129,8 @@ public class ShowGraph extends AppCompatActivity {
             //ボタンがタップされた時のそれぞれの処理をswitch文で記述
             //「送信」ならば、テキストボックスの文字列を取得し、データベースに保存
             switch (view.getId()) {
-                case R.id.bt_return:
+                case R.id.btn_return:
                     finish();
-                    break;
-                case R.id.btn_Show:
-                    // レイアウトからSpinnerを取得
-                    //spCat = findViewById(R.id.sp_Graph);
-                    //Spinnerからカテゴリ名取得
-                    //category = (String) spCat.getSelectedItem();
-                    //当該カテゴリの要素を配列に代入
-                    valuearray = getvaluelist(category);
-                    //グラフ表示
-                    setList(valuearray);
                     break;
             }
         }

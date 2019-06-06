@@ -41,9 +41,9 @@ public class MainActivity extends AppCompatActivity {
         final TextView Mscoretex = (TextView) findViewById(R.id.Meal_score);
         final ImageView faceScaleImageView = (ImageView) findViewById(R.id.Face_image);
 
-        Button btrecord =findViewById(R.id.bt_record);
-        Button btList =findViewById(R.id.bt_List);
-        Button btGraph= findViewById(R.id.bt_Graph);
+        Button btnRecord =findViewById(R.id.btn_record);
+        Button btnList =findViewById(R.id.btn_list);
+        Button btGraph= findViewById(R.id.btn_graph);
 
         //データベース取得
         helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(this);
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         RecordconfirmDialog.setMessage(R.string.dialog_msg);  //内容(メッセージ)設定
 
         // OK(肯定的な)ボタンの設定
-        RecordconfirmDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        RecordconfirmDialog.setPositiveButton(R.string.dialog_positive, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 // OKボタン押下時の処理
                // Log.d("AlertDialog", "Positive which :" + which);
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // NG(否定的な)ボタンの設定
-        RecordconfirmDialog.setNegativeButton("NG", new DialogInterface.OnClickListener() {
+        RecordconfirmDialog.setNegativeButton(R.string.dialog_negative, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 // NGボタン押下時の処理
                // Log.d("AlertDialog", "Negative which :" + which);
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        btrecord.setOnClickListener(new View.OnClickListener() {
+        btnRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btList.setOnClickListener(new View.OnClickListener() {
+        btnList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
