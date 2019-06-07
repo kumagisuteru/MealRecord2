@@ -65,6 +65,7 @@ public class ShowList extends AppCompatActivity {
              */
             public boolean onItemLongClick(AdapterView<?> parent, final View view, final int position, long id) {
 
+                //ダイアログ表示
                 AlertDialog.Builder builder = new AlertDialog.Builder(ShowList.this);
                 builder.setTitle(getString(R.string.dialog_title))
                         .setMessage(R.string.dialog_delete)
@@ -111,15 +112,6 @@ public class ShowList extends AppCompatActivity {
 
         @Override
         public void onClick(View view) {
-            //データベースが存在していなかったら作る？
-            if (helper == null) {
-                helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(getApplicationContext());
-            }
-
-            if (db == null) {
-                db = helper.getWritableDatabase();
-            }
-
             //ボタン押下時の処理
             switch (view.getId()) {
                 //戻るボタン
