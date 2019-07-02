@@ -51,7 +51,7 @@ public class ShowList extends AppCompatActivity {
         db = helper.getReadableDatabase();
 
         //画面遷移時に表示するために、onCreate内でデータベースの表示を行う
-        category = "満腹度";
+        category = "痛み";
         readData(category);
 
 

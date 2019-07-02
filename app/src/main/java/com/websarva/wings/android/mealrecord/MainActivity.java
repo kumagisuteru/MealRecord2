@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         db = helper.getReadableDatabase();
 
         //シークバー
-        Mscoretex.setText("満腹度:"+seekM.getProgress());
+        Mscoretex.setText("痛み:"+seekM.getProgress());
 
         seekM.setOnSeekBarChangeListener(
                 new SeekBar.OnSeekBarChangeListener() {
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
 
-                        Mscoretex.setText("満腹度:"+seekM.getProgress());
+                        Mscoretex.setText("痛み:"+seekM.getProgress());
                     }
                     @Override
                     public void onStartTrackingTouch(SeekBar seekBar) {
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 stdate = sdf.format(date);
                 //categoryに満腹度を代入
                 //複数のカテゴリがある場合、レイアウト等から該当するカテゴリを取ってきて代入
-                category = "満腹度";
+                category = "痛み";
                 //シークバーの数値を取ってくる
                 score = seekM.getProgress();
                 //日付時刻と文字列をデータベースに記録

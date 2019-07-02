@@ -48,7 +48,7 @@ public class ShowGraph extends AppCompatActivity {
     SQLiteDatabase db;
 
     private Spinner spCat;
-    private String category = "満腹度";
+    private String category = "痛み";
     Integer valuearray[];
     private LineChart mChart;
 
