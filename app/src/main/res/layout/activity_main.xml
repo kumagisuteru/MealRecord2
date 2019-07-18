@@ -18,7 +18,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/painface3" />
+        app:srcCompat="@drawable/face3" />
 
     <TextView
         android:id="@+id/Meal_score"
