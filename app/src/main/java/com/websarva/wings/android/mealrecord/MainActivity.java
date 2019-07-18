@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private String stdate;
     private String category;
     private int score;
+    private int test;
 
 
     @Override

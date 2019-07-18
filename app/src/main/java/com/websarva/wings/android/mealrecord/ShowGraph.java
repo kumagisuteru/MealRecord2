@@ -16,11 +16,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.websarva.wings.android.mealrecord.R;
 
@@ -50,6 +53,7 @@ public class ShowGraph extends AppCompatActivity {
     private Spinner spCat;
     private String category = "痛み";
     Integer valuearray[];
+    Date datearray[];
     private LineChart mChart;
 
     @Override
@@ -76,6 +80,8 @@ public class ShowGraph extends AppCompatActivity {
         xAxis.enableGridDashedLine(10f, 10f, 0f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
+
+
         YAxis leftAxis = mChart.getAxisLeft();
         // Y軸最大最小設定 今後変更の必要あり
         leftAxis.setAxisMaximum(100f);
@@ -100,8 +106,11 @@ public class ShowGraph extends AppCompatActivity {
 
 
         valuearray = getvaluelist(category);
+        datearray = getDatelist(category);
+
+
         //グラフ表示
-        setList(valuearray);
+        setList(datearray, valuearray);
 
         mChart.animateX(2500);
         //mChart.invalidate();
@@ -112,6 +121,7 @@ public class ShowGraph extends AppCompatActivity {
 
 
     }
+
 
 
     private View.OnClickListener btnTap = new View.OnClickListener() {
@@ -140,9 +150,9 @@ public class ShowGraph extends AppCompatActivity {
 
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
 
-    /*
+
     //カテゴリ名を引数に、グラフに表示するデータを取得するメソッド
-    public ArrayList<Date> getDatelist(String cat) {
+    public Date[] getDatelist(String cat) {
         Log.d("debug", "**********Cursor");
 
         //query(テーブル名, 取得するレコード, WHERE句, WHERE句の指定の値,
@@ -168,6 +178,7 @@ public class ShowGraph extends AppCompatActivity {
         String stringdate;
         Date date = new Date();
         ArrayList<Date> datelist = new ArrayList<>();
+        Date datearray[];
         for (int i = 0; i < cursor.getCount(); i++) {
             stringdate = cursor.getString(1);
             try {
@@ -183,9 +194,10 @@ public class ShowGraph extends AppCompatActivity {
         Log.d("debug", "**********" + sbuilder.toString());
         //textView.setText(sbuilder.toString());
 
-        return datelist;
+        datearray=(Date[])datelist.toArray(new Date[datelist.size()]);
+        return datearray;
     }
-    */
+
 
     private Integer[] getvaluelist(String cat) {
         Integer valuearray[];
@@ -217,16 +229,19 @@ public class ShowGraph extends AppCompatActivity {
         return valuearray;
     }
 
-    private void setList(Integer valuearray[]) {
+    private void setList(Date datearray[], Integer valuearray[]) {
 // Entry()を使ってLineDataSetに設定できる形に変更してarrayを新しく作成
         mChart.notifyDataSetChanged();
         mChart.invalidate();
 
         ArrayList<Entry> values = new ArrayList<>();
 
+
         for (int i = 0; i < valuearray.length; i++) {
             values.add(new Entry(i, valuearray[i], null, null));
         }
+
+
 
         LineDataSet lineDataSet;
 
