@@ -1,60 +1,54 @@
 package com.websarva.wings.android.mealrecord;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
-import android.icu.text.AlphabeticIndex;
-import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.websarva.wings.android.mealrecord.R;
+import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.websarva.wings.android.mealrecord.ShowGraph.*;
 
-
-import com.github.mikephil.charting.components.Legend;
-
-import com.github.mikephil.charting.data.Entry;
-/*
-import org.achartengine.ChartFactory;
-import org.achartengine.GraphicalView;
-import org.achartengine.model.TimeSeries;
-import org.achartengine.model.XYMultipleSeriesDataset;
-*/
-import java.text.DateFormat;
+import java.lang.reflect.Array;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class ShowGraph extends AppCompatActivity {
 
-    //変数宣言
+    private LineChart mpLineChart;
+    long millis;
+    Integer minutes;
+    Integer valuearray[];
+    Integer datearray[];
     com.websarva.wings.android.mealrecord.DataBaseHelper helper;
     SQLiteDatabase db;
 
-    private Spinner spCat;
-    private String category = "痛み";
-    Integer valuearray[];
-    Date datearray[];
-    private LineChart mChart;
+    LineDataSet lineDataSet;
+
+    private String category = "満腹度";
+
+    SimpleDateFormat sdfLong;
+    SimpleDateFormat sdfmmdd;
+    SimpleDateFormat sdfhhmm;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,39 +56,9 @@ public class ShowGraph extends AppCompatActivity {
         setContentView(R.layout.activity_show_graph);
 
 
-        // 戻るボタン・グラフ領域のオブジェクト取得
-        Button btnBack = findViewById(R.id.btn_return);
-        btnBack.setOnClickListener(btnTap);
+        mpLineChart =(LineChart)findViewById(R.id.line_chart);
 
-        mChart = findViewById(R.id.line_chart);
-
-
-        // Grid背景色
-        mChart.setDrawGridBackground(true);
-
-        // no description text
-        mChart.getDescription().setEnabled(true);
-
-        // Grid縦軸を破線
-        XAxis xAxis = mChart.getXAxis();
-        xAxis.enableGridDashedLine(10f, 10f, 0f);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-
-
-
-        YAxis leftAxis = mChart.getAxisLeft();
-        // Y軸最大最小設定 今後変更の必要あり
-        leftAxis.setAxisMaximum(100f);
-        leftAxis.setAxisMinimum(0f);
-        // Grid横軸を破線
-        leftAxis.enableGridDashedLine(10f, 10f, 0f);
-        leftAxis.setDrawZeroLine(true);
-
-        // 右側の目盛り
-        mChart.getAxisRight().setEnabled(false);
-
-        // add data
-        //setData();
+        //dataSets.add(lineDataSet2);
 
         if (helper == null) {
             helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(getApplicationContext());
@@ -104,25 +68,104 @@ public class ShowGraph extends AppCompatActivity {
             db = helper.getWritableDatabase();
         }
 
-
         valuearray = getvaluelist(category);
         datearray = getDatelist(category);
 
-
-        //グラフ表示
-        setList(datearray, valuearray);
-
-        mChart.animateX(2500);
-        //mChart.invalidate();
-
-        // dont forget to refresh the drawing
-        // mChart.invalidate();
+        lineDataSet = setList(datearray, valuearray);
 
 
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        dataSets.add(lineDataSet);
+
+
+
+        /*****
+
+         グラフのスタイルのセッティング
+
+         *****/
+        //背景色
+//        mpLineChart.setBackgroundColor(Color.GRAY);
+        //データがない時の表示とその文字の色
+        mpLineChart.setNoDataText("No Data");
+        mpLineChart.setNoDataTextColor(Color.BLUE);
+
+        //グラフの格子の表示
+        mpLineChart.setDrawGridBackground(true);
+
+        //グラフの外枠を濃く(見やすく)表示
+        mpLineChart.setDrawBorders(true);
+        mpLineChart.setBorderColor(Color.GRAY);
+        mpLineChart.setBorderWidth(3);
+
+        mpLineChart.setVisibleXRangeMaximum(4);
+        //mpLineChart.setVisibleXRangeMinimum(2);
+        mpLineChart.moveViewToX(2);
+
+        /*****
+         * グラフの線と点に関する設定
+         */
+        lineDataSet.setLineWidth(2);
+        lineDataSet.setColor(Color.BLUE);
+        lineDataSet.setDrawCircles(true);
+        lineDataSet.setDrawCircleHole(true);
+        lineDataSet.setCircleColor(Color.BLUE);
+        lineDataSet.setCircleColorHole(Color.GRAY);
+        lineDataSet.setCircleRadius(5);
+        lineDataSet.setCircleHoleRadius(4);
+        lineDataSet.setValueTextSize(10);
+        lineDataSet.setValueTextColor(Color.BLUE);
+        //lineDataSet.enableDashedLine(5,10,0);
+        //lineDataSet.setColors(colorArray, ShowGraph.this);
+
+        /****
+         * 凡例の設定
+         */
+
+        Legend legend = mpLineChart.getLegend();
+        legend.setEnabled(true);
+        legend.setTextColor(Color.BLUE);
+        legend.setTextSize(15);
+        //凡例のアイコンの変更
+        legend.setForm(Legend.LegendForm.CIRCLE);
+        legend.setFormSize(10);
+        //凡例同士の間隔
+        legend.setXEntrySpace(50);
+        legend.setFormToTextSpace(10);
+
+
+        XAxis xAxis = mpLineChart.getXAxis();
+        YAxis yAxisLeft = mpLineChart.getAxisLeft();
+        YAxis yAxisRight = mpLineChart.getAxisRight();
+
+        //x軸の設定
+        xAxis.setValueFormatter(new MyAxisValueFormatter());
+        //y軸の設定
+        //yAxisLeft.setValueFormatter(new MyAxisValueFormatter());
+
+        yAxisLeft.setAxisMaximum(100f);
+        yAxisLeft.setAxisMinimum(0f);
+        yAxisRight.setEnabled(false);
+
+        /*****
+         * グラフの右下のやつ
+         *****/
+        Description description = new Description();
+        description.setText("...");
+        description.setTextColor(Color.BLUE);
+        description.setTextSize(15);
+        mpLineChart.setDescription(description);
+
+        LineData data = new LineData(dataSets);
+
+        //プロットした点の表記を変える(全部)
+        //data.setValueFormatter(new MyValueFormatter());
+        //データセット1だけ
+        lineDataSet.setValueFormatter(new MyValueFormatter());
+        mpLineChart.setData(data);
+        mpLineChart.invalidate();
 
     }
-
-
 
     private View.OnClickListener btnTap = new View.OnClickListener() {
         @Override
@@ -147,12 +190,8 @@ public class ShowGraph extends AppCompatActivity {
     };
 
 
-
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
-
-
     //カテゴリ名を引数に、グラフに表示するデータを取得するメソッド
-    public Date[] getDatelist(String cat) {
+    public Integer[] getDatelist(String cat) {
         Log.d("debug", "**********Cursor");
 
         //query(テーブル名, 取得するレコード, WHERE句, WHERE句の指定の値,
@@ -171,22 +210,28 @@ public class ShowGraph extends AppCompatActivity {
         cursor.moveToFirst();
 
         StringBuilder sbuilder = new StringBuilder();
+        sdfLong = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
         // 忘れずに！
         //cursor.close();
         //
         String stringdate;
         Date date = new Date();
-        ArrayList<Date> datelist = new ArrayList<>();
-        Date datearray[];
+        ArrayList<Integer> datelist = new ArrayList<>();
+        Integer datearray[];
         for (int i = 0; i < cursor.getCount(); i++) {
             stringdate = cursor.getString(1);
             try {
-                date = dateFormat.parse(stringdate);
+                date = sdfLong.parse(stringdate);
+                //ミリ秒に変換
+                millis = date.getTime();
+                millis = millis / 60000;
+                //分に変換
+                minutes = (int)millis;
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            datelist.add(i, date);
+            datelist.add(i, minutes);
             cursor.moveToNext();
         }
 
@@ -194,7 +239,7 @@ public class ShowGraph extends AppCompatActivity {
         Log.d("debug", "**********" + sbuilder.toString());
         //textView.setText(sbuilder.toString());
 
-        datearray=(Date[])datelist.toArray(new Date[datelist.size()]);
+        datearray=(Integer[])datelist.toArray(new Integer[datelist.size()]);
         return datearray;
     }
 
@@ -229,56 +274,47 @@ public class ShowGraph extends AppCompatActivity {
         return valuearray;
     }
 
-    private void setList(Date datearray[], Integer valuearray[]) {
+    private class MyValueFormatter implements IValueFormatter{
+
+        @Override
+        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+            int intvalue;
+            intvalue = (int)value;
+            String strvalue = String.valueOf(intvalue);
+            return strvalue;
+        }
+    }
+
+    private class MyAxisValueFormatter implements IAxisValueFormatter{
+
+        @Override
+        public String getFormattedValue(float value, AxisBase axis) {
+            //axis.setLabelCount(10, true);
+            //sdfShort= new SimpleDateFormat("yyyy/MM/dd");
+            sdfmmdd = new SimpleDateFormat("MM/dd");
+            //sdfhhmm = new SimpleDateFormat("HH:mm");
+            value = value * 60000;
+            String dateText = sdfmmdd.format(value);
+            //String datetimeText = dateText + "\n" + sdfhhmm.format(value);
+            return dateText;
+            // return value + " $";
+
+        }
+    }
+
+    private LineDataSet setList(Integer datearray[], Integer valuearray[]) {
 // Entry()を使ってLineDataSetに設定できる形に変更してarrayを新しく作成
-        mChart.notifyDataSetChanged();
-        mChart.invalidate();
+        mpLineChart.notifyDataSetChanged();
+        mpLineChart.invalidate();
 
         ArrayList<Entry> values = new ArrayList<>();
-
-
-        for (int i = 0; i < valuearray.length; i++) {
-            values.add(new Entry(i, valuearray[i], null, null));
-        }
-
-
-
         LineDataSet lineDataSet;
 
-        if (mChart.getData() != null &&
-                mChart.getData().getDataSetCount() > 0) {
-
-            lineDataSet = (LineDataSet) mChart.getData().getDataSetByIndex(0);
-            lineDataSet.setValues(values);
-            mChart.getData().notifyDataChanged();
-            mChart.notifyDataSetChanged();
-        } else {
-
-            // create a dataset and give it a type
-            lineDataSet = new LineDataSet(values, category);
-
-            lineDataSet.setDrawIcons(false);
-            lineDataSet.setColor(Color.BLACK);
-            lineDataSet.setCircleColor(Color.BLACK);
-            lineDataSet.setLineWidth(1f);
-            lineDataSet.setCircleRadius(3f);
-            lineDataSet.setDrawCircleHole(false);
-            lineDataSet.setValueTextSize(0f);
-            lineDataSet.setDrawFilled(true);
-            lineDataSet.setFormLineWidth(1f);
-            lineDataSet.setFormLineDashEffect(new DashPathEffect(new float[]{10f, 5f}, 0f));
-            lineDataSet.setFormSize(15.f);
-
-            lineDataSet.setFillColor(Color.BLUE);
-
-            ArrayList<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
-            dataSets.add(lineDataSet); // add the datasets
-
-            // create a data object with the datasets
-            LineData lineData = new LineData(dataSets);
-
-            // set data
-            mChart.setData(lineData);
+        for (int i = 0; i < valuearray.length; i++) {
+            values.add(new Entry(datearray[i], valuearray[i], null, null));
         }
+        lineDataSet = new LineDataSet(values, category);
+
+        return lineDataSet;
     }
 }

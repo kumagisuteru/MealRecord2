@@ -42,8 +42,7 @@ public class ShowList extends AppCompatActivity {
         setContentView(R.layout.activity_show_list);
 
         //レイアウト取得
-        Button btnBack = findViewById(R.id.btn_return);
-        btnBack.setOnClickListener(btnTap);
+
         listView = findViewById(R.id.list_view);
 
         //データベース取得
@@ -51,7 +50,7 @@ public class ShowList extends AppCompatActivity {
         db = helper.getReadableDatabase();
 
         //画面遷移時に表示するために、onCreate内でデータベースの表示を行う
-        category = "痛み";
+        category = "満腹度";
         readData(category);
 
 
