@@ -1,4 +1,5 @@
 package com.websarva.wings.android.mealrecord;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -55,10 +56,10 @@ public class ShowGraph extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_graph);
 
+        Resources res = getResources();
+        int maincolor = res.getColor(R.color.colorMain);
 
         mpLineChart =(LineChart)findViewById(R.id.line_chart);
-
-        //dataSets.add(lineDataSet2);
 
         if (helper == null) {
             helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(getApplicationContext());
@@ -106,15 +107,15 @@ public class ShowGraph extends AppCompatActivity {
          * グラフの線と点に関する設定
          */
         lineDataSet.setLineWidth(2);
-        lineDataSet.setColor(Color.BLUE);
+        lineDataSet.setColor(maincolor);
         lineDataSet.setDrawCircles(true);
         lineDataSet.setDrawCircleHole(true);
-        lineDataSet.setCircleColor(Color.BLUE);
-        lineDataSet.setCircleColorHole(Color.GRAY);
+        lineDataSet.setCircleColor(Color.GRAY);
+        lineDataSet.setCircleColorHole(maincolor);
         lineDataSet.setCircleRadius(5);
         lineDataSet.setCircleHoleRadius(4);
         lineDataSet.setValueTextSize(10);
-        lineDataSet.setValueTextColor(Color.BLUE);
+        lineDataSet.setValueTextColor(maincolor);
         //lineDataSet.enableDashedLine(5,10,0);
         //lineDataSet.setColors(colorArray, ShowGraph.this);
 
@@ -124,7 +125,7 @@ public class ShowGraph extends AppCompatActivity {
 
         Legend legend = mpLineChart.getLegend();
         legend.setEnabled(true);
-        legend.setTextColor(Color.BLUE);
+        legend.setTextColor(maincolor);
         legend.setTextSize(15);
         //凡例のアイコンの変更
         legend.setForm(Legend.LegendForm.CIRCLE);
@@ -239,6 +240,7 @@ public class ShowGraph extends AppCompatActivity {
         Log.d("debug", "**********" + sbuilder.toString());
         //textView.setText(sbuilder.toString());
 
+        //リストを配列に変換
         datearray=(Integer[])datelist.toArray(new Integer[datelist.size()]);
         return datearray;
     }
@@ -267,9 +269,10 @@ public class ShowGraph extends AppCompatActivity {
             valuelist.add(i, cursor.getInt(3));
             cursor.moveToNext();
         }
-// 忘れずに！
+        // 忘れずに！
         cursor.close();
-        //
+
+        //リストを配列に変換
         valuearray=(Integer[])valuelist.toArray(new Integer[valuelist.size()]);
         return valuearray;
     }
