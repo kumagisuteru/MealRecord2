@@ -99,9 +99,9 @@ public class ShowGraph extends AppCompatActivity {
         mpLineChart.setBorderColor(Color.GRAY);
         mpLineChart.setBorderWidth(3);
 
-        mpLineChart.setVisibleXRangeMaximum(4);
+        //mpLineChart.setVisibleXRangeMaximum(4);
         //mpLineChart.setVisibleXRangeMinimum(2);
-        mpLineChart.moveViewToX(2);
+        //mpLineChart.moveViewToX(2);
 
         /*****
          * グラフの線と点に関する設定
