@@ -3,13 +3,13 @@
     <string name="btn_record">記録</string>
     <string name="dialog_title">記録確認</string>
     <string name="txt_finTitle">記録完了</string>
-    <string name="dialog_msg">指定された数値で記録を行います。よろしいですか？</string>
+    <string name="dialog_msg">指定された数値で記録を行います。\nよろしいですか？</string>
     <string name="dialog_positive">はい</string>
     <string name="dialog_negative">いいえ</string>
     <string name="dialog_ng_toast">記録をキャンセルしました</string>
     <string name="dialog_delete">削除します。よろしいですか？</string>
     <string name="dialog_deleted">削除しました。</string>
-    <string name="record_thxA">記録お疲れ様です。\n食べ過ぎたようですね、次の食事を減らしたり運動をしたりしてはどうでしょうか。</string>
+    <string name="record_thxA">記録お疲れ様です。\nこの調子で記録を続けていきましょう。</string>
     <string name="record_thxB">記録お疲れ様です。\n食事量をコントロールできていますね。今後も腹8分目を意識していきましょう。</string>
     <string name="txt_fullness">満腹度</string>
     <string name="btn_delete">削除</string>
