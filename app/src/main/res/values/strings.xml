@@ -11,12 +11,12 @@
     <string name="dialog_deleted">削除しました。</string>
     <string name="record_thxA">記録お疲れ様です。\nこの調子で記録を続けていきましょう。</string>
     <string name="record_thxB">記録お疲れ様です。\n食事量をコントロールできていますね。今後も腹8分目を意識していきましょう。</string>
-    <string name="txt_fullness">満腹度</string>
+    <string name="txt_fullness">痛み</string>
     <string name="btn_delete">削除</string>
     <string name="hint">input</string>
     <string name="btn_return">戻る</string>
     <string name="btn_list">リスト</string>
     <string name="btn_graph">グラフ</string>
     <string name="btn_show">表示</string>
-    <string name="txt_category">満腹度</string>
+    <string name="txt_category">痛み</string>
 </resources>

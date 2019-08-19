@@ -44,7 +44,7 @@ public class ShowGraph extends AppCompatActivity {
 
     LineDataSet lineDataSet;
 
-    private String category = "満腹度";
+    private String category = "痛み";
 
     SimpleDateFormat sdfLong;
     SimpleDateFormat sdfmmdd;
