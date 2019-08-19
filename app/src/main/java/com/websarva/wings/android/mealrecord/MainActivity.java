@@ -62,19 +62,19 @@ public class MainActivity extends AppCompatActivity {
                         Mscore = seekM.getProgress();
 
                         if(Mscore >= 0 && Mscore < 20){
-                            faceScaleImageView.setImageResource(R.drawable.pface1);
+                            faceScaleImageView.setImageResource(R.drawable.painf1);
 
                         }else if(Mscore >= 20 && Mscore < 40){
-                            faceScaleImageView.setImageResource(R.drawable.pface2);
+                            faceScaleImageView.setImageResource(R.drawable.painf2);
 
                         }else if(Mscore >= 40 && Mscore < 60){
-                            faceScaleImageView.setImageResource(R.drawable.pface3);
+                            faceScaleImageView.setImageResource(R.drawable.painf3);
 
                         }else if(Mscore >= 60 && Mscore < 80){
-                            faceScaleImageView.setImageResource(R.drawable.pface4);
+                            faceScaleImageView.setImageResource(R.drawable.painf4);
 
                         }else if(Mscore >= 80 && Mscore <= 100){
-                            faceScaleImageView.setImageResource(R.drawable.pface5);
+                            faceScaleImageView.setImageResource(R.drawable.painf5);
 
                         }
 
