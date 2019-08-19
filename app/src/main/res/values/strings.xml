@@ -9,8 +9,8 @@
     <string name="dialog_ng_toast">記録をキャンセルしました</string>
     <string name="dialog_delete">削除します。よろしいですか？</string>
     <string name="dialog_deleted">削除しました。</string>
-    <string name="record_thxA">記録お疲れ様です。\nこの調子で記録を続けていきましょう。</string>
-    <string name="record_thxB">記録お疲れ様です。\n食事量をコントロールできていますね。今後も腹8分目を意識していきましょう。</string>
+    <string name="record_thxA">記録お疲れ様です。\n痛みが出ている時は無理せず休憩をしましょう。</string>
+    <string name="record_thxB">記録お疲れ様です。\n</string>
     <string name="txt_fullness">痛み</string>
     <string name="btn_delete">削除</string>
     <string name="hint">input</string>
