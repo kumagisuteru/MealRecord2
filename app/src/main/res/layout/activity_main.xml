@@ -7,6 +7,16 @@
     android:background="#3203A9F4"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/txt_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <ImageView
         android:id="@+id/Face_image"
@@ -55,15 +65,28 @@
         android:id="@+id/btn_record"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:background="#2196F3"
         android:text="@string/btn_record"
         android:textColor="#F8F5F5"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/btn_graph"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/seekBar_Meal" />
+
+    <Button
+        android:id="@+id/btn_consult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:background="#808080"
+        android:text="@string/btn_consult"
+        android:textColor="#F8F5F5"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_record" />
 
     <Button
         android:id="@+id/btn_graph"

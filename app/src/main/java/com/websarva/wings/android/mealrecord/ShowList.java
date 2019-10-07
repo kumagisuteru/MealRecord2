@@ -75,15 +75,18 @@ public class ShowList extends AppCompatActivity {
                                 // 選択されたビューを取得 TwoLineListItemを取得した後、text2の値を取得する
                                 TwoLineListItem two = (TwoLineListItem) view;
                                 TextView idTextView = (TextView) two.getText2();
-                                delId = (String) idTextView.getText();
-
+                                String strId = (String) idTextView.getText();
+                                Log.d("strid",strId);
+                                String[] time = strId.split(" ", 2);
+                                delId = time[1];
+                                Log.d("delid",delId);
                                 // 長押しした項目をデータベースから削除
-                               // SQLiteDatabase db = helper.getWritableDatabase();
+                                // SQLiteDatabase db = helper.getWritableDatabase();
                                 //try {
-                                    db.delete("mrdb", "datetime = ?", new String[]{delId});
+                                db.delete("paindb", "time = ?", new String[]{delId});
                                 //} finally {
                                 //    db.close();
-                               // }
+                                // }
 
                                 // remove item from ArrayList
                                 //memoList.remove(position);
@@ -135,12 +138,12 @@ public class ShowList extends AppCompatActivity {
 
         //引数のカテゴリ名を基にデータベース内のデータを抽出する
         Cursor cursor = db.query(
-                "mrdb",
-                new String[] { "_id","datetime", "category", "value" },
+                "paindb",
+                new String[] { "_id", "year", "month", "date", "time", "value"},
                 //new String[] {"datetime", "category", "value" },
-                "category=?",
+                null,
                 //"category=?",
-                new String[]{cat},
+                null,
                 //new String[]{"Satisfaction"},
                 null,
                 null,
@@ -152,7 +155,7 @@ public class ShowList extends AppCompatActivity {
 
         //StringBuilder sbuilder = new StringBuilder();
         StringBuilder sb1 = new StringBuilder();
-        String date;
+        StringBuilder sb2 = new StringBuilder();
 
         //ArrayList data = new ArrayList<>();
         List<Map<String, String>> data = new ArrayList<Map<String, String>>();
@@ -161,14 +164,21 @@ public class ShowList extends AppCompatActivity {
         // ID: 年/日/月 時:分:秒: カテゴリ名: 値
         for (int i = 0; i < cursor.getCount(); i++) {
             Map<String, String> item = new HashMap<String, String>();
-            sb1.append(cursor.getString(2));
+            sb1.append("痛み");
             sb1.append(": ");
-            sb1.append(cursor.getInt(3));
-            date = cursor.getString(1);
+            sb1.append(cursor.getInt(5));
+            sb2.append(cursor.getInt(1)) ;
+            sb2.append("/");
+            sb2.append(cursor.getInt(2));
+            sb2.append("/");
+            sb2.append(cursor.getInt(3));
+            sb2.append(" ");
+            sb2.append(cursor.getString(4));
             item.put("Subject", sb1.toString());
-            item.put("Comment", date);
+            item.put("Comment", sb2.toString());
             data.add(item);
             sb1.delete(0, sb1.length());
+            sb2.delete(0, sb2.length());
             cursor.moveToNext();
         }
 
@@ -192,6 +202,8 @@ public class ShowList extends AppCompatActivity {
 
 
 
+
+
     //画面を再読み込みする関数
     private void reload() {
         intent = getIntent();
@@ -203,4 +215,3 @@ public class ShowList extends AppCompatActivity {
         startActivity(intent);
     }
 }
-

@@ -3,19 +3,26 @@ package com.websarva.wings.android.mealrecord;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.location.LocationListener;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,11 +30,24 @@ public class MainActivity extends AppCompatActivity {
     //変数宣言
     com.websarva.wings.android.mealrecord.DataBaseHelper helper;
     private SQLiteDatabase db;
-    private Date date;
-    private String stdate;
-    private String category;
+    private int iYear;
+    private int iMonth;
+    private int iDate;
+    private int iValue;
+    private String strTime;
     private int score;
     private int test;
+    private Calendar calendar;
+
+    int bootCount = 0;
+    int date=0;
+    int currentdate;
+
+    SharedPreferences pref;
+    SharedPreferences.Editor editor;
+
+    Button button;
+    Intent intent;
 
 
     @Override
@@ -46,12 +66,30 @@ public class MainActivity extends AppCompatActivity {
         Button btnList =findViewById(R.id.btn_list);
         Button btGraph= findViewById(R.id.btn_graph);
 
+        calendar = Calendar.getInstance();
+        button = (Button) findViewById(R.id.btn_consult);
+        button.setOnClickListener(btnTap);
+        button.setEnabled(false);
+        //デフォルトのSharedPreferencesから保存された"bootCount"を取得
+        pref= PreferenceManager.getDefaultSharedPreferences(this);
+        bootCount = pref.getInt("bootCount", 1);
+        date = pref.getInt("date", calendar.get(Calendar.MINUTE));
+        Log.d("date ",String.valueOf(date) );
+
+        //画面のインスタンスを取得
+        TextView textView= (TextView)findViewById(R.id.txt_count);
+        //onCreateが呼ばれた回数を3桁で0埋めして表示用のTextViewに設定
+        textView.setText(String.format("%1$03d", bootCount));
+
         //データベース取得
         helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(this);
         db = helper.getReadableDatabase();
 
         //シークバー
         Mscoretex.setText("痛み:"+seekM.getProgress());
+
+
+
 
         seekM.setOnSeekBarChangeListener(
                 new SeekBar.OnSeekBarChangeListener() {
@@ -105,21 +143,24 @@ public class MainActivity extends AppCompatActivity {
         RecordconfirmDialog.setPositiveButton(R.string.dialog_positive, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 // OKボタン押下時の処理
-               // Log.d("AlertDialog", "Positive which :" + which);
+                // Log.d("AlertDialog", "Positive which :" + which);
 
                 //OKボタン押下時の日付取得
-                date = new Date();
-                //日付表記を変更
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                calendar = Calendar.getInstance();
+                iYear = calendar.get(Calendar.YEAR);
+                iMonth = calendar.get(Calendar.MONTH);
+                iDate = calendar.get(Calendar.DATE);
+                int iHour = calendar.get(Calendar.HOUR);
+                int iMinute = calendar.get(Calendar.MINUTE);
+                int iSecond = calendar.get(Calendar.SECOND);
                 //string型に変換
-                stdate = sdf.format(date);
+                strTime = iHour +":"+iMinute +":"+iSecond;
                 //categoryに満腹度を代入
                 //複数のカテゴリがある場合、レイアウト等から該当するカテゴリを取ってきて代入
-                category = "痛み";
                 //シークバーの数値を取ってくる
                 score = seekM.getProgress();
                 //日付時刻と文字列をデータベースに記録
-                insertData(db, stdate, category, score);
+                insertData(db, iYear, iMonth, iDate, strTime, score);
 
                 //完了画面表示
                 Intent intent = new Intent(getApplication(), Recordfin_Activity.class);
@@ -131,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         RecordconfirmDialog.setNegativeButton(R.string.dialog_negative, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 // NGボタン押下時の処理
-               // Log.d("AlertDialog", "Negative which :" + which);
+                // Log.d("AlertDialog", "Negative which :" + which);
             }
         });
 
@@ -145,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
 
         btnList.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -167,14 +209,92 @@ public class MainActivity extends AppCompatActivity {
 
     //データベースに記録する関数
     //引数は データベース,日付文字列,カテゴリ,数値
-    public void insertData(SQLiteDatabase db, String dat, String cat, int val) {
+    public void insertData(SQLiteDatabase db, int year, int month, int date, String time, int value) {
 
         ContentValues values = new ContentValues();
-        values.put("datetime", dat);
-        values.put("category", cat);
-        values.put("value", val);
+        values.put("year", year);
+        values.put("month", month);
+        values.put("date", date);
+        values.put("time", time);
+        values.put("value", value);
 
-        //mrdbという名前のデータベースに保存
-        db.insert("mrdb", null, values);
+        db.insert("paindb", null, values);
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        calendar = Calendar.getInstance();
+        Resources res = getResources();
+        int color = res.getColor(R.color.colorMain);
+
+
+        /**
+         * calendar.get(Calendar.MINUTE);
+         * MINUTEにすると分ごとにカウントが増える
+         * DATEなら1日ごと
+         * SECONDなら秒ごと
+         */
+        currentdate = calendar.get(Calendar.MINUTE);
+        Log.d("cdate ",String.valueOf(currentdate) );
+
+        if(currentdate != date){
+            date = currentdate;
+            bootCount +=1;
+            editor = pref.edit();
+            editor.putInt("bootCount", bootCount);
+            editor.commit();
+
+
+
+            /**
+             * if文の条件で右上のカウント数に応じて表示を変える
+             */
+            if(bootCount  >1) {
+                button.setEnabled(true);
+                new AlertDialog.Builder(this)
+                        .setTitle("お知らせ")
+                        .setMessage("先生と相談できるようになりました")
+                        .setPositiveButton("OK", null)
+                        .show();
+                button.setBackgroundColor(color);
+
+
+            }else {
+                new AlertDialog.Builder(this)
+                        //.setTitle("title")
+                        .setMessage("今日も1日頑張っていきましょう！")
+                        .setPositiveButton("OK", null)
+                        .show();
+                button.setBackgroundColor(Color.GRAY);
+            }
+        }
+        //button.setEnabled(false);
+
+
+
+        //画面のインスタンスを取得
+        TextView textView= (TextView)findViewById(R.id.txt_count);
+        //onCreateが呼ばれた回数を3桁で0埋めして表示用のTextViewに設定
+        textView.setText(String.format("%1$03d", bootCount));
+    }
+    // ボタンAに OnClickListenerを実装する
+    private View.OnClickListener btnTap = new View.OnClickListener() {
+
+        // ボタンAクリック時に呼ばれるメソッド
+        @Override
+        public void onClick(View view) {
+
+            String packageName = "com.google.android.gm";
+            PackageManager pm = getPackageManager();
+            Intent intent = pm.getLaunchIntentForPackage(packageName);
+            startActivity(intent);
+            bootCount=0;
+            button.setBackgroundColor(Color.GRAY);
+            button.setEnabled(false);
+
+
+        }
+    };
+
 }

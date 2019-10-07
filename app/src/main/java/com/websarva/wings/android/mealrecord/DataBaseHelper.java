@@ -14,12 +14,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     データベースファイル名の定数フィールド
      */
 
-    private static final String DATABASE_NAME = "MealRecord.db";
-    private static final String TABLE_NAME = "mrdb";
+    private static final String DATABASE_NAME = "PainRecord.db";
+    private static final String TABLE_NAME = "paindb";
     private static final String _ID = "_id";
-    private static final String DATETIME = "datetime";
-    private static final String COLUMN_NAME_TITLE = "category";
-    private static final String COLUMN_NAME_SUBTITLE = "value";
+    private static final String YEAR = "year";
+    private static final String MONTH = "month";
+    private static final String DATE = "date";
+    private static final String TIME = "time";
+    private static final String VALUE = "value";
 
 
 
@@ -27,7 +29,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     バージョン情報の定数フィールド
      */
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     /*
     コンストラクタ
@@ -53,9 +55,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     _ID + " INTEGER PRIMARY KEY," +
-                    DATETIME +" TEXT, " +
-                    COLUMN_NAME_TITLE + " TEXT," +
-                    COLUMN_NAME_SUBTITLE + " INTEGER)";
+                    YEAR + " INTEGER, " +
+                    MONTH + " INTEGER, " +
+                    DATE + " INTEGER, " +
+                    TIME + " TEXT, " +
+                    VALUE + " INTEGER)";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + TABLE_NAME;
@@ -74,4 +78,3 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 }
-

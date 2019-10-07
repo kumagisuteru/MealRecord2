@@ -1,4 +1,5 @@
 package com.websarva.wings.android.mealrecord;
+
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -36,7 +37,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class ShowGraph extends AppCompatActivity {
+public class ShowSummary extends AppCompatActivity {
 
     final long MILLIS_PER_1Day = 86400000;
     private LineChart mpLineChart;
@@ -56,26 +57,12 @@ public class ShowGraph extends AppCompatActivity {
 
     SimpleDateFormat sdfLong;
     SimpleDateFormat sdfmmdd;
-    SimpleDateFormat sdfhhmm;
 
-    private Spinner spYear;
-    private Spinner spMonth;
-    private Spinner spDate;
-
-    private int iYear;
-    private int iMonth;
-    private int iDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_graph);
-
-        // 戻るボタン・グラフ領域のオブジェクト取得
-        Button btnSummary = findViewById(R.id.btn_summary);
-        btnSummary.setOnClickListener(btnTap);
-        Button btnShow = findViewById(R.id.btn_show);
-        btnShow.setOnClickListener(btnTap);
+        setContentView(R.layout.activity_show_summary);
 
         Resources res = getResources();
         int maincolor = res.getColor(R.color.colorMain);
@@ -150,132 +137,163 @@ public class ShowGraph extends AppCompatActivity {
         description.setTextSize(15);
         mpLineChart.setDescription(description);
 
+
+
+        if (helper == null) {
+            helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(getApplicationContext());
+        }
+
+        if (db == null) {
+            db = helper.getWritableDatabase();
+        }
+
+        ArrayList<ILineDataSet> dataSets;
+        LineData data;
+
+
+        //x軸の設定
+        XAxis xAxis = mpLineChart.getXAxis();
+        xAxis.setValueFormatter(new MyAxisValueFormatterForMean());
+        meandate = getMeanList();
+        lineDataSet1 = setList(meandate.date,meandate.value, 0, false);
+        lineDataSet2 = setList(meandate.date, meandate.count,0, true);
+        dataSets = new ArrayList<>();
+        dataSets.add(lineDataSet1);
+        dataSets.add(lineDataSet2);
+        data = new LineData(dataSets);
+        lineDataSet1.setValueFormatter(new MyValueFormatter());
+        lineDataSet2.setValueFormatter(new MyValueFormatter());
+        setLinesAndPointsDetails(lineDataSet1);
+        setLinesAndPointsDetails2(lineDataSet2);
+        mpLineChart.setData(data);
+        mpLineChart.invalidate();
+
     }
 
-    private View.OnClickListener btnTap = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
 
-            if (helper == null) {
-                helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(getApplicationContext());
-            }
+    private ValueDate getMeanList() {
+        Integer meanarray[];
+        String strdatearray[];
+        Integer datearray[];
+        Integer countarray[];
 
-            if (db == null) {
-                db = helper.getWritableDatabase();
-            }
+        int tempdate;
+        Integer tempvalue;
+        Integer tempcount=0;
 
-            ArrayList<ILineDataSet> dataSets;
-            LineData data;
-            XAxis xAxis = mpLineChart.getXAxis();
-            //ボタンがタップされた時のそれぞれの処理をswitch文で記述
-            //「送信」ならば、テキストボックスの文字列を取得し、データベースに保存
-            switch (view.getId()) {
+        ArrayList<Integer> templist = new ArrayList<>();
+        ArrayList<Integer> meanlist = new ArrayList<>();
+        ArrayList<String> datelist = new ArrayList<>();
+        ArrayList<Integer> countlist = new ArrayList<>();
 
-                case R.id.btn_summary:
-                    //reload();
-                    intent = new Intent(getApplication(), ShowSummary.class);
-                    startActivity(intent);
-                    break;
+        Log.d("debug", "**********Cursor");
 
-                case R.id.btn_show:
-                    xAxis = mpLineChart.getXAxis();
-                    xAxis.setAxisMinimum(-32500f);
-                    xAxis.setAxisMaximum(54200f);
-                    xAxis.setValueFormatter(new MyAxisValueFormatter());
-                    spYear = findViewById(R.id.sp_year);
-                    String strYear = (String)spYear.getSelectedItem();
-                    iYear = Integer.parseInt(strYear);
-                    //Log.d("year", String.valueOf(iYear));
-                    spMonth = findViewById(R.id.sp_month);
-                    String strMonth = (String)spMonth.getSelectedItem();
-                    iMonth = Integer.parseInt(strMonth);
-                    //Log.d("month", String.valueOf(iMonth));
-                    spDate = findViewById(R.id.sp_date);
-                    String strDate = (String)spDate.getSelectedItem();
-                    iDate = Integer.parseInt(strDate);
-                    //Log.d("date", String.valueOf(iDate));
-
-                    oneday = getOnedayList(iYear, iMonth, iDate);
-                    //Log.d("oneday", "ok");
-                    lineDataSet1 = setList(oneday.date, oneday.value, 1,false);
-                    //Log.d("linedataset", "ok");
-                    dataSets = new ArrayList<>();
-                    dataSets.add(lineDataSet1);
-                    //Log.d("datasets.add", "ok");
-                    data = new LineData(dataSets);
-                    //Log.d("data", "ok");
-                    lineDataSet1.setValueFormatter(new MyValueFormatter());
-                    setLinesAndPointsDetails(lineDataSet1);
-                    //Log.d("setvalue", "ok");
-                    mpLineChart.setData(data);
-                    //Log.d("setdata", "ok");
-                    mpLineChart.invalidate();
-                    break;
-            }
-        }
-    };
-
-    private ValueDate getOnedayList(int year, int month, int date){
-
-        ArrayList<Integer> valuelist = new ArrayList<>();
-        ArrayList<Integer> datelist = new ArrayList<>();
-
+        //query(テーブル名, 取得するレコード, WHERE句, WHERE句の指定の値,
+        // GROUP BY句 同じ値を持つデータでグループ化,
+        // HAVING句 WHERE句のグループ版, ORDER BY句 並び順)
         Cursor cursor = db.query(
                 "paindb",
-                new String[]{"year", "month", "date", "time", "value"},
-                "year=? AND month=? AND date=?",
-                new String[]{String.valueOf(year) , String.valueOf(month), String.valueOf(date)},
+                new String[]{"year", "month", "date", "value"},
+                null,
+                null,
                 null,
                 null,
                 null
         );
 
         cursor.moveToFirst();
-
-        sdfLong = new SimpleDateFormat("HH:mm:ss");
-
-        // 忘れずに！
-        //cursor.close();
-        //
-
-
-        Date onedate = new Date();
-        if(cursor.getCount() < 1){
-            finish();
-        }
+        Log.d("count", String.valueOf(cursor.getCount()));
 
         for (int i = 0; i < cursor.getCount(); i++) {
-            try {
-                onedate = sdfLong.parse(cursor.getString(3));
-                Log.d("strdate", cursor.getString(3));
+            tempcount++;
+            tempdate = cursor.getInt(2);
+            templist.add(cursor.getInt(3));
+            Log.d("date", String.valueOf(cursor.getInt(2)));
+            Log.d("value", String.valueOf(cursor.getInt(3)));
+            cursor.moveToNext();
+//            Log.d("date", String.valueOf(cursor.getInt(2)));
+            //          Log.d("value", String.valueOf(cursor.getInt(3)));
+            if(i >= cursor.getCount()-1){
+                break;
+            }
+            Log.d("i", String.valueOf(i));
+            int nextdate =cursor.getInt(2);
+
+            if(tempdate == nextdate){
+                continue;
+            }else {
+                tempvalue = mean(templist);
+                Log.d("mean", String.valueOf(tempvalue));
+                meanlist.add(tempvalue);
+                datelist.add(cursor.getInt(1)+"/"+cursor.getInt(2));
+                countlist.add(tempcount);
+                templist.clear();
+                tempcount=0;
+            }
+        }
+        cursor.moveToPrevious ();
+        tempvalue = mean(templist);
+        meanlist.add(tempvalue);
+        datelist.add(cursor.getInt(1)+"/"+cursor.getInt(2));
+        countlist.add(tempcount);
+        // 忘れずに！
+        cursor.close();
+
+        Log.d("last", String.valueOf(meanlist.get(meanlist.size()-1)));
+
+        //リストを配列に変換
+        meanarray=(Integer[])meanlist.toArray(new Integer[meanlist.size()]);
+        strdatearray=(String[])datelist.toArray(new String[datelist.size()]);
+        datearray = convertStrDatetoInt(strdatearray);
+        countarray = (Integer[])countlist.toArray(new Integer[countlist.size()]);
+
+        ValueDate meandate = new ValueDate();
+        meandate.value=meanarray;
+        meandate.date=datearray;
+        meandate.count=countarray;
+
+        return  meandate;
+
+    }
+
+    private static Integer mean(ArrayList<Integer> list){
+        int mean;
+        if(list.size()==0){
+            return 0;
+        }
+        int sum = 0;
+        for(int i=0; i<list.size(); i++){
+            sum += list.get(i);
+        }
+        mean =  sum / list.size();
+        return (Integer)mean;
+    }
+
+    private Integer[] convertStrDatetoInt(String[] strdate){
+        Integer intDate[];
+        Integer imillis=0;
+        Date date = new Date();
+        long millis;
+        sdfmmdd = new SimpleDateFormat("MM/dd");
+        List<String> list = Arrays.asList(strdate);
+        ArrayList<Integer> datelist = new ArrayList<>();
+        Log.d("list_0", String.valueOf(list.get(0)));
+        for(int i=0; i<list.size(); i++){
+            try{
+                date = sdfmmdd.parse(list.get(i));
                 //ミリ秒に変換
-                millis = onedate.getTime();
-                //millis+= 32400000;
-                millis = millis / 1000;
-                //分に変換
-                minutes = (int)millis;
+                millis = date.getTime();
+                millis = millis / MILLIS_PER_1Day;
+                imillis = (int)millis;
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            datelist.add(minutes);
-            valuelist.add(cursor.getInt(4));
-            Log.d("intdate", String.valueOf(datelist.get(i)));
-            Log.d("value", String.valueOf(valuelist.get(i)));
-            cursor.moveToNext();
+            datelist.add(imillis);
         }
-        cursor.close();
-        //リストを配列に変換
-        valuearray=(Integer[])valuelist.toArray(new Integer[valuelist.size()]);
-        datearray=(Integer[])datelist.toArray(new Integer[datelist.size()]);
+        intDate=(Integer[])datelist.toArray(new Integer[datelist.size()]);
 
-        ValueDate onedaydata = new ValueDate();
-        onedaydata.value=valuearray;
-        onedaydata.date=datearray;
-
-        return  onedaydata;
+        return intDate;
     }
-
-
 
     private class MyValueFormatter implements IValueFormatter{
 
@@ -295,24 +313,20 @@ public class ShowGraph extends AppCompatActivity {
         Integer count[];
     }
 
-    private class MyAxisValueFormatter implements IAxisValueFormatter{
+    private class MyAxisValueFormatterForMean implements IAxisValueFormatter{
 
         @Override
         public String getFormattedValue(float value, AxisBase axis) {
             //axis.setLabelCount(10, true);
-            //sdfShort= new SimpleDateFormat("yyyy/MM/dd");
-            sdfhhmm = new SimpleDateFormat("HH:mm");
+            sdfmmdd = new SimpleDateFormat("MM/dd");
             //sdfhhmm = new SimpleDateFormat("HH:mm");
-            value = value * 1000;
-            String dateText = sdfhhmm.format(value);
+            value = value * MILLIS_PER_1Day;
+            String dateText = sdfmmdd.format(value);
             //String datetimeText = dateText + "\n" + sdfhhmm.format(value);
             return dateText;
-            // return value + " $";
 
         }
     }
-
-
     private LineDataSet setList(Integer datearray[], Integer valuearray[], int flag, boolean count) {
 // Entry()を使ってLineDataSetに設定できる形に変更してarrayを新しく作成
         mpLineChart.notifyDataSetChanged();
@@ -335,10 +349,10 @@ public class ShowGraph extends AppCompatActivity {
 
         } else if (flag ==0 && !count){
             // create a dataset and give it a type
-            lineDataSet = new LineDataSet(values, "痛みの強さ");
+            lineDataSet = new LineDataSet(values, "痛みの強さ平均");
 
         } else{
-            lineDataSet = new LineDataSet(values, "痛みの強さ");
+            lineDataSet = new LineDataSet(values, "記録回数");
         }
         return lineDataSet;
     }
@@ -369,15 +383,27 @@ public class ShowGraph extends AppCompatActivity {
 
     }
 
+    private void setLinesAndPointsDetails2(LineDataSet lineDataSet){
 
-    //画面を再読み込みする関数
-    private void reload() {
-        intent = getIntent();
-        overridePendingTransition(0, 0);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        finish();
+        /*****
+         * グラフの線と点に関する設定
+         */
+        Resources res = getResources();
+        int accentcolor = res.getColor(R.color.colorAccent);
+        lineDataSet.setLineWidth(2);
+        lineDataSet.setColor(accentcolor);
+        lineDataSet.setDrawCircles(true);
+        lineDataSet.setDrawCircleHole(true);
+        lineDataSet.setCircleColor(Color.GRAY);
+        lineDataSet.setCircleColorHole(accentcolor);
+        lineDataSet.setCircleRadius(5);
+        lineDataSet.setCircleHoleRadius(4);
+        lineDataSet.setValueTextSize(10);
+        lineDataSet.setValueTextColor(accentcolor);
+        //lineDataSet.enableDashedLine(5,10,0);
+        //lineDataSet.setColors(colorArray, ShowGraph.this);
 
-        overridePendingTransition(0, 0);
-        startActivity(intent);
+
     }
 }
+

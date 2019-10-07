@@ -18,5 +18,65 @@
     <string name="btn_list">リスト</string>
     <string name="btn_graph">グラフ</string>
     <string name="btn_show">表示</string>
+    <string name="btn_summary">まとめ</string>
+    <string name="btn_consult">医師に相談</string>
     <string name="txt_category">痛み</string>
+    <string name="txt_year">年</string>
+    <string name="txt_month">月</string>
+    <string name="txt_date">日</string>
+    <string name="txt_add_sound">音について</string>
+    <string name="txt_add_light">光について</string>
+
+    <string-array name="sp_year">
+        <item>2019</item>
+        <item>2020</item>
+    </string-array>
+    <string-array name="sp_month">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+    </string-array>
+    <string-array name="sp_date">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+        <item>26</item>
+        <item>27</item>
+        <item>28</item>
+        <item>29</item>
+        <item>30</item>
+        <item>31</item>
+    </string-array>
+    <string name="title_activity_show_ave_counts">ShowAveCounts</string>
 </resources>
