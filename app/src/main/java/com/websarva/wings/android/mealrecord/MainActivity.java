@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
+import android.location.Location;
 import android.location.LocationListener;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
@@ -43,11 +44,17 @@ public class MainActivity extends AppCompatActivity {
     int date=0;
     int currentdate;
 
+    int lat;
+    int lng;
+
+    Location gps;
+
     SharedPreferences pref;
     SharedPreferences.Editor editor;
 
     Button button;
     Intent intent;
+    ContextAct mConAct;
 
 
     @Override
@@ -75,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
         bootCount = pref.getInt("bootCount", 1);
         date = pref.getInt("date", calendar.get(Calendar.MINUTE));
         Log.d("date ",String.valueOf(date) );
+
+        //MainActivityのactivityとcontextを保持するクラスのインスタンス生成
+        mConAct = new ContextAct(this, getApplicationContext());
 
         //画面のインスタンスを取得
         TextView textView= (TextView)findViewById(R.id.txt_count);
@@ -159,8 +169,21 @@ public class MainActivity extends AppCompatActivity {
                 //複数のカテゴリがある場合、レイアウト等から該当するカテゴリを取ってきて代入
                 //シークバーの数値を取ってくる
                 score = seekM.getProgress();
+
+                /**
+                 * バックグラウンド処理開始
+                 */
+                MyJobService.schedule();
+
+                gps = new LocationService().getLocation();
+
+
+
+                lat = (int)(gps.getLatitude()*100);
+                lng = (int)(gps.getLongitude()*100);
+
                 //日付時刻と文字列をデータベースに記録
-                insertData(db, iYear, iMonth, iDate, strTime, score);
+                insertData(db, iYear, iMonth, iDate, strTime, score, lng, lat);
 
                 //完了画面表示
                 Intent intent = new Intent(getApplication(), Recordfin_Activity.class);
@@ -192,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(getApplication(), ShowList.class);
+                intent = new Intent(getApplication(), ShowList.class);
                 startActivity(intent);
             }
         });
@@ -200,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(getApplication(), ShowGraph.class);
+                intent = new Intent(getApplication(), ShowGraph.class);
                 startActivity(intent);
             }
         });
@@ -209,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
 
     //データベースに記録する関数
     //引数は データベース,日付文字列,カテゴリ,数値
-    public void insertData(SQLiteDatabase db, int year, int month, int date, String time, int value) {
+    public void insertData(SQLiteDatabase db, int year, int month, int date, String time, int value, int lng, int lat) {
 
         ContentValues values = new ContentValues();
         values.put("year", year);
@@ -217,6 +240,8 @@ public class MainActivity extends AppCompatActivity {
         values.put("date", date);
         values.put("time", time);
         values.put("value", value);
+        values.put("longitude", lng);
+        values.put("latitude", lat);
 
         db.insert("paindb", null, values);
     }

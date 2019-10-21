@@ -24,6 +24,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String VALUE = "value";
 
 
+    private static final String LONGITUDE = "longitude";
+    private static final String LATITUDE = "latitude";
+
 
     /*
     バージョン情報の定数フィールド
@@ -59,7 +62,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     MONTH + " INTEGER, " +
                     DATE + " INTEGER, " +
                     TIME + " TEXT, " +
-                    VALUE + " INTEGER)";
+                    VALUE + " INTEGER, " +
+                    LONGITUDE + " INTEGER, " +
+                    LATITUDE + " INTEGER )";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + TABLE_NAME;

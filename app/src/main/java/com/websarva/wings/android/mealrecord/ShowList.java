@@ -139,7 +139,7 @@ public class ShowList extends AppCompatActivity {
         //引数のカテゴリ名を基にデータベース内のデータを抽出する
         Cursor cursor = db.query(
                 "paindb",
-                new String[] { "_id", "year", "month", "date", "time", "value"},
+                new String[] { "_id", "year", "month", "date", "time", "value", "longitude", "latitude"},
                 //new String[] {"datetime", "category", "value" },
                 null,
                 //"category=?",
@@ -167,6 +167,12 @@ public class ShowList extends AppCompatActivity {
             sb1.append("痛み");
             sb1.append(": ");
             sb1.append(cursor.getInt(5));
+            sb1.append("\n");
+            sb1.append("longitude---");
+            sb1.append(cursor.getInt(6));
+            sb1.append(" / ");
+            sb1.append("latitude---");
+            sb1.append(cursor.getInt(7));
             sb2.append(cursor.getInt(1)) ;
             sb2.append("/");
             sb2.append(cursor.getInt(2));
