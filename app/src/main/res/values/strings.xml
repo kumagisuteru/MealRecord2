@@ -26,7 +26,8 @@
     <string name="txt_date">日</string>
     <string name="txt_add_sound">音について</string>
     <string name="txt_add_light">光について</string>
-
+    <string name="toast">データがありません</string>
+    <string name="img_trend">img_trend</string>
     <string-array name="sp_year">
         <item>2019</item>
         <item>2020</item>

@@ -66,10 +66,18 @@
 
         <Button
             android:id="@+id/btn_show"
-            android:layout_width="match_parent"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:text="@string/btn_show" />
+
+        <ImageView
+            android:id="@+id/img_trend"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="@string/img_trend"
+            />
     </LinearLayout>
+
 
 
     <LinearLayout

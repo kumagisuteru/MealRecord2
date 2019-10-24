@@ -11,7 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -40,6 +42,11 @@ import java.util.List;
 public class ShowSummary extends AppCompatActivity {
 
     final long MILLIS_PER_1Day = 86400000;
+    final int INCREASE_TREND =1;
+    final int STAGNATION_TREND =0;
+    final int DECREMENT_TREND =-1;
+    final double BORDER_OF_TREND = 0.2;
+
     private LineChart mpLineChart;
     long millis;
     Integer minutes;
@@ -48,7 +55,11 @@ public class ShowSummary extends AppCompatActivity {
     com.websarva.wings.android.mealrecord.DataBaseHelper helper;
     SQLiteDatabase db;
     ValueDate meandate;
-    ValueDate oneday;
+
+    int trend;
+    double roc;
+    ImageView imgTrend;
+    private boolean check= false;
 
     LineDataSet lineDataSet1;
     LineDataSet lineDataSet2;
@@ -66,6 +77,8 @@ public class ShowSummary extends AppCompatActivity {
 
         Resources res = getResources();
         int maincolor = res.getColor(R.color.colorMain);
+
+        imgTrend = findViewById(R.id.img_trend);
 
         mpLineChart =(LineChart)findViewById(R.id.line_chart);
 
@@ -154,19 +167,35 @@ public class ShowSummary extends AppCompatActivity {
         //x軸の設定
         XAxis xAxis = mpLineChart.getXAxis();
         xAxis.setValueFormatter(new MyAxisValueFormatterForMean());
-        meandate = getMeanList();
-        lineDataSet1 = setList(meandate.date,meandate.value, 0, false);
-        lineDataSet2 = setList(meandate.date, meandate.count,0, true);
-        dataSets = new ArrayList<>();
-        dataSets.add(lineDataSet1);
-        dataSets.add(lineDataSet2);
-        data = new LineData(dataSets);
-        lineDataSet1.setValueFormatter(new MyValueFormatter());
-        lineDataSet2.setValueFormatter(new MyValueFormatter());
-        setLinesAndPointsDetails(lineDataSet1);
-        setLinesAndPointsDetails2(lineDataSet2);
-        mpLineChart.setData(data);
-        mpLineChart.invalidate();
+        check = checkEmpty(0,0,0,true);
+        if(check) {
+            meandate = getMeanList();
+            if (meandate.value.length < 1) {
+                Toast.makeText(ShowSummary.this, R.string.toast, Toast.LENGTH_SHORT).show();
+                reload();
+                //break;
+            } else {
+                roc = calculateRateOfChange(meandate.value, meandate.value.length);
+                trend = judgeTrend(roc);
+            }
+
+            showTrend(trend);
+            lineDataSet1 = setList(meandate.date, meandate.value, 0, false);
+            lineDataSet2 = setList(meandate.date, meandate.count, 0, true);
+            dataSets = new ArrayList<>();
+            dataSets.add(lineDataSet1);
+            dataSets.add(lineDataSet2);
+            data = new LineData(dataSets);
+            lineDataSet1.setValueFormatter(new MyValueFormatter());
+            lineDataSet2.setValueFormatter(new MyValueFormatter());
+            setLinesAndPointsDetails(lineDataSet1);
+            setLinesAndPointsDetails2(lineDataSet2);
+            mpLineChart.setData(data);
+            mpLineChart.invalidate();
+        }else{
+            Toast.makeText(ShowSummary.this,R.string.toast, Toast.LENGTH_SHORT).show();
+            reload();
+        }
 
     }
 
@@ -176,7 +205,7 @@ public class ShowSummary extends AppCompatActivity {
         String strdatearray[];
         Integer datearray[];
         Integer countarray[];
-
+        int tempmonth;
         int tempdate;
         Integer tempvalue;
         Integer tempcount=0;
@@ -194,7 +223,7 @@ public class ShowSummary extends AppCompatActivity {
         Cursor cursor = db.query(
                 "paindb",
                 new String[]{"year", "month", "date", "value"},
-                null,
+                "value > 0",
                 null,
                 null,
                 null,
@@ -206,26 +235,28 @@ public class ShowSummary extends AppCompatActivity {
 
         for (int i = 0; i < cursor.getCount(); i++) {
             tempcount++;
+            tempmonth = cursor.getInt(1);
             tempdate = cursor.getInt(2);
             templist.add(cursor.getInt(3));
-            Log.d("date", String.valueOf(cursor.getInt(2)));
-            Log.d("value", String.valueOf(cursor.getInt(3)));
+            //Log.d("date", String.valueOf(cursor.getInt(2)));
+            //Log.d("value", String.valueOf(cursor.getInt(3)));
             cursor.moveToNext();
 //            Log.d("date", String.valueOf(cursor.getInt(2)));
             //          Log.d("value", String.valueOf(cursor.getInt(3)));
             if(i >= cursor.getCount()-1){
                 break;
             }
-            Log.d("i", String.valueOf(i));
+            //Log.d("i", String.valueOf(i));
             int nextdate =cursor.getInt(2);
 
             if(tempdate == nextdate){
                 continue;
             }else {
                 tempvalue = mean(templist);
-                Log.d("mean", String.valueOf(tempvalue));
+                //Log.d("mean", String.valueOf(tempvalue));
                 meanlist.add(tempvalue);
-                datelist.add(cursor.getInt(1)+"/"+cursor.getInt(2));
+                //datelist.add(cursor.getInt(1)+"/"+cursor.getInt(2));
+                datelist.add(tempmonth+"/"+tempdate);
                 countlist.add(tempcount);
                 templist.clear();
                 tempcount=0;
@@ -404,6 +435,97 @@ public class ShowSummary extends AppCompatActivity {
         //lineDataSet.setColors(colorArray, ShowGraph.this);
 
 
+    }
+
+    private void showTrend(int trend){
+        if(trend == INCREASE_TREND){
+            imgTrend.setImageResource(R.drawable.increse);
+        }else if(trend == STAGNATION_TREND){
+            imgTrend.setImageResource(R.drawable.stagnation);
+        }else{
+            imgTrend.setImageResource(R.drawable.decrese);
+        }
+    }
+
+    private  boolean checkEmpty(int year, int month, int date, boolean flag){
+        if (flag) {
+            Cursor cursor = db.query(
+                    "paindb",
+                    new String[]{"year", "month", "date", "value"},
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            cursor.moveToFirst();
+            Log.d("count", String.valueOf(cursor.getCount()));
+            if(cursor.getCount()>=1){
+                check = true;
+            }
+        }else {
+            Cursor cursor = db.query(
+                    "paindb",
+                    new String[]{"year", "month", "date", "value"},
+                    "year=? AND month=? AND date=?",
+                    new String[]{String.valueOf(year) , String.valueOf(month), String.valueOf(date)},
+                    null,
+                    null,
+                    null
+            );
+            cursor.moveToFirst();
+            Log.d("count", String.valueOf(cursor.getCount()));
+            if (cursor.getCount() >= 1) {
+                check = true;
+            }
+        }
+        return check;
+    }
+
+    private void reload() {
+        intent = getIntent();
+        overridePendingTransition(0, 0);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        finish();
+
+        overridePendingTransition(0, 0);
+        startActivity(intent);
+    }
+
+    private double calculateRateOfChange(Integer[] array, int length){
+        double rateofchange=0;
+        if(length == 1){
+            rateofchange = 0;
+        }else if(length < 5) {
+            for (int i = length - 1; i > 0; i--) {
+                Log.d("i", String.valueOf(array[i]));
+                Log.d("i-1", String.valueOf(array[i - 1]));
+
+                rateofchange += (double) (array[i] - array[i - 1]) / array[i - 1];
+                Log.d("rateofchange", String.valueOf(rateofchange));
+            }
+        } else{
+            for(int i = length-1; i>length - 5; i--){
+                Log.d("i", String.valueOf(array[i]));
+                Log.d("i-1", String.valueOf(array[i-1]));
+
+                rateofchange += (double)(array[i]-array[i-1])/array[i-1];
+                Log.d("rateofchange", String.valueOf(rateofchange));
+            }
+        }
+        return rateofchange;
+    }
+
+    private int judgeTrend(double roc){
+        int trend;
+        if(roc>BORDER_OF_TREND){
+            trend = INCREASE_TREND;
+        }else if(roc< BORDER_OF_TREND*(-1)){
+            trend = DECREMENT_TREND;
+        }else{
+            trend = STAGNATION_TREND;
+        }
+        return trend;
     }
 }
 

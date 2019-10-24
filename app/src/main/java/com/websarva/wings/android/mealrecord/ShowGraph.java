@@ -10,7 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -39,6 +41,11 @@ import java.util.List;
 public class ShowGraph extends AppCompatActivity {
 
     final long MILLIS_PER_1Day = 86400000;
+    final int INCREASE_TREND =1;
+    final int STAGNATION_TREND =0;
+    final int DECREMENT_TREND =-1;
+
+    final double BORDER_OF_TREND = 0.2;
     private LineChart mpLineChart;
     long millis;
     Integer minutes;
@@ -53,6 +60,11 @@ public class ShowGraph extends AppCompatActivity {
     LineDataSet lineDataSet2;
 
     private Intent intent;
+
+    int trend;
+    double roc;
+    ImageView imgTrend;
+    private boolean check= false;
 
     SimpleDateFormat sdfLong;
     SimpleDateFormat sdfmmdd;
@@ -79,6 +91,8 @@ public class ShowGraph extends AppCompatActivity {
 
         Resources res = getResources();
         int maincolor = res.getColor(R.color.colorMain);
+
+        imgTrend = findViewById(R.id.img_trend);
 
         mpLineChart =(LineChart)findViewById(R.id.line_chart);
 
@@ -194,22 +208,38 @@ public class ShowGraph extends AppCompatActivity {
                     String strDate = (String)spDate.getSelectedItem();
                     iDate = Integer.parseInt(strDate);
                     //Log.d("date", String.valueOf(iDate));
+                    check = checkEmpty(iYear, iMonth, iDate,false);
 
-                    oneday = getOnedayList(iYear, iMonth, iDate);
-                    //Log.d("oneday", "ok");
-                    lineDataSet1 = setList(oneday.date, oneday.value, 1,false);
-                    //Log.d("linedataset", "ok");
-                    dataSets = new ArrayList<>();
-                    dataSets.add(lineDataSet1);
-                    //Log.d("datasets.add", "ok");
-                    data = new LineData(dataSets);
-                    //Log.d("data", "ok");
-                    lineDataSet1.setValueFormatter(new MyValueFormatter());
-                    setLinesAndPointsDetails(lineDataSet1);
-                    //Log.d("setvalue", "ok");
-                    mpLineChart.setData(data);
-                    //Log.d("setdata", "ok");
-                    mpLineChart.invalidate();
+                    if(check){
+                        oneday = getOnedayList(iYear, iMonth, iDate);
+                        if(oneday.date.length<1) {
+                            Toast.makeText(ShowGraph.this,R.string.toast, Toast.LENGTH_SHORT).show();
+                            reload();
+                            break;
+                        }else{
+                            roc = calculateRateOfChange(oneday.value, oneday.value.length);
+                            trend =judgeTrend(roc);
+                        }
+                        showTrend(trend);
+                        Log.d("trend", String.valueOf(trend));
+                        //Log.d("oneday", "ok");
+                        lineDataSet1 = setList(oneday.date, oneday.value, 1,false);
+                        //Log.d("linedataset", "ok");
+                        dataSets = new ArrayList<>();
+                        dataSets.add(lineDataSet1);
+                        //Log.d("datasets.add", "ok");
+                        data = new LineData(dataSets);
+                        //Log.d("data", "ok");
+                        lineDataSet1.setValueFormatter(new MyValueFormatter());
+                        setLinesAndPointsDetails(lineDataSet1);
+                        //Log.d("setvalue", "ok");
+                        mpLineChart.setData(data);
+                        //Log.d("setdata", "ok");
+                        mpLineChart.invalidate();
+                    }else{
+                        Toast.makeText(ShowGraph.this,R.string.toast, Toast.LENGTH_SHORT).show();
+                        reload();
+                    }
                     break;
             }
         }
@@ -370,7 +400,51 @@ public class ShowGraph extends AppCompatActivity {
     }
 
 
-    //画面を再読み込みする関数
+    private void showTrend(int trend){
+        if(trend == INCREASE_TREND){
+            imgTrend.setImageResource(R.drawable.increse);
+        }else if(trend == STAGNATION_TREND){
+            imgTrend.setImageResource(R.drawable.stagnation);
+        }else{
+            imgTrend.setImageResource(R.drawable.decrese);
+        }
+    }
+
+    private  boolean checkEmpty(int year, int month, int date, boolean flag){
+        if (flag) {
+            Cursor cursor = db.query(
+                    "paindb",
+                    new String[]{"year", "month", "date", "value"},
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            cursor.moveToFirst();
+            Log.d("count", String.valueOf(cursor.getCount()));
+            if(cursor.getCount()>=1){
+                check = true;
+            }
+        }else {
+            Cursor cursor = db.query(
+                    "paindb",
+                    new String[]{"year", "month", "date", "value"},
+                    "year=? AND month=? AND date=?",
+                    new String[]{String.valueOf(year) , String.valueOf(month), String.valueOf(date)},
+                    null,
+                    null,
+                    null
+            );
+            cursor.moveToFirst();
+            Log.d("count", String.valueOf(cursor.getCount()));
+            if (cursor.getCount() >= 1) {
+                check = true;
+            }
+        }
+        return check;
+    }
+
     private void reload() {
         intent = getIntent();
         overridePendingTransition(0, 0);
@@ -380,4 +454,41 @@ public class ShowGraph extends AppCompatActivity {
         overridePendingTransition(0, 0);
         startActivity(intent);
     }
+
+    private double calculateRateOfChange(Integer[] array, int length){
+        double rateofchange=0;
+        if(length == 1){
+            rateofchange = 0;
+        }else if(length < 5) {
+            for (int i = length - 1; i > 0; i--) {
+                Log.d("i", String.valueOf(array[i]));
+                Log.d("i-1", String.valueOf(array[i - 1]));
+
+                rateofchange += (double) (array[i] - array[i - 1]) / array[i - 1];
+                Log.d("rateofchange", String.valueOf(rateofchange));
+            }
+        } else{
+            for(int i = length-1; i>length - 5; i--){
+                Log.d("i", String.valueOf(array[i]));
+                Log.d("i-1", String.valueOf(array[i-1]));
+
+                rateofchange += (double)(array[i]-array[i-1])/array[i-1];
+                Log.d("rateofchange", String.valueOf(rateofchange));
+            }
+        }
+        return rateofchange;
+    }
+
+    private int judgeTrend(double roc){
+        int trend;
+        if(roc>BORDER_OF_TREND){
+            trend = INCREASE_TREND;
+        }else if(roc< BORDER_OF_TREND*(-1)){
+            trend = DECREMENT_TREND;
+        }else{
+            trend = STAGNATION_TREND;
+        }
+        return trend;
+    }
+
 }
