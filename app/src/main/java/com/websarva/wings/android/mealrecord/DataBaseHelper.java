@@ -10,10 +10,10 @@ import android.util.Log;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
-    /*
+    /**
     データベースファイル名の定数フィールド
+     データベースを変更するときに触る場所は大体ここともう1か所
      */
-
     private static final String DATABASE_NAME = "PainRecord.db";
     private static final String TABLE_NAME = "paindb";
     private static final String _ID = "_id";
@@ -26,10 +26,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String LATITUDE = "latitude";
 
 
-    /*
+    /**
     バージョン情報の定数フィールド
+     プログラムが間違っていないのにデータベース関係のエラーが出る場合，
+     ここの数字を2とかにしてみる
      */
-
     private static final int DATABASE_VERSION = 1;
 
     /*
@@ -53,6 +54,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * データベースを変更する際に触る場所
+     * データベースの列名と型を指定する
+     */
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     _ID + " INTEGER PRIMARY KEY," +

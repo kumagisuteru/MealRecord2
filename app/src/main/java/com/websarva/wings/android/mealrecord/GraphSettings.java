@@ -14,6 +14,10 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import java.text.SimpleDateFormat;
 
+/**
+ * グラフの見た目を変更するクラス
+ */
+
 public class GraphSettings {
     protected static final long MILLIS_PER_1Day =86400000;
 
@@ -177,6 +181,5 @@ public class GraphSettings {
 
         }
     }
-
 
 }

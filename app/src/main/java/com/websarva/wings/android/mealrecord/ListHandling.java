@@ -27,7 +27,10 @@ import static com.websarva.wings.android.mealrecord.ShowGraph.db;
 public class ListHandling {
     protected static final long MILLIS_PER_1Day =86400000;
 
+    //ある1日のデータを取り出すときに使用
     protected static Cursor getOnedayCursor(int year, int month, int date) {
+        //データベースを取り出すときは以下のように...
+        //第1引数データベースのテーブル名，第2引数取り出す列，第3引数取り出すデータの条件，第4引数?の部分をString型で指定
         Cursor cursor = db.query(
                 "paindb",
                 new String[]{"year", "month", "date", "time", "value"},
@@ -49,14 +52,16 @@ public class ListHandling {
         long millis;
         int minutes=0;
         Date onedate;
+        //時間の表示形式を以下のように指定
         SimpleDateFormat sdfhms = new SimpleDateFormat("HH:mm:ss");
 
         Cursor cursor = getOnedayCursor(year, month, date);
 
         for (int i = 0; i < cursor.getCount(); i++) {
             try {
+                //データベースに保存された文字列型の時間をDate型に代入
                 onedate = sdfhms.parse(cursor.getString(3));
-                //HH:mm:ssをミリ秒に変換
+                //Date型の関数でHH:mm:ssで表記された文字列ををミリ秒に変換
                 millis = onedate.getTime();
                 //桁が多すぎるのでミリ秒→秒へ
                 millis = millis / 1000;
@@ -65,6 +70,7 @@ public class ListHandling {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+            //ミリ秒をdatelistに，その時の痛みの強さをvalueリストに追加
             datelist.add(minutes);
             valuelist.add(cursor.getInt(4));
             cursor.moveToNext();
@@ -167,8 +173,9 @@ public class ListHandling {
 
     }
 
+    //各日の平均値と記録回数を取得するために使用
     private static PainData getMeanGraphData(Cursor cursor){
-        Integer meanarray[] ,datearray[], countarray[];;
+        Integer meanarray[] ,datearray[], countarray[];
         String strdatearray[];
         int tempmonth, tempdate, nextmonth, nextdate;
         Integer tempvalue, tempcount=0;
@@ -283,7 +290,6 @@ public class ListHandling {
         lineDataSet.setValueFormatter(new MyValueFormatter());
         return lineDataSet;
     }
-
 
     protected static  class MyValueFormatter implements IValueFormatter {
         @Override

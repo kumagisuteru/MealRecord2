@@ -8,88 +8,68 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.icu.text.SimpleDateFormat;
 import android.location.Location;
-import android.location.LocationListener;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
 import java.util.Calendar;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
     //変数宣言
     com.websarva.wings.android.mealrecord.DataBaseHelper helper;
     private SQLiteDatabase db;
-    private int iYear;
-    private int iMonth;
-    private int iDate;
-    private int iValue;
+    private int iYear, iMonth, iDate, score, currentdate, lng, lat;
     private String strTime;
-    private int score;
-    private int test;
     private Calendar calendar;
-
-    int bootCount = 0;
-    int date=0;
-    int currentdate;
-
-    int lat;
-    int lng;
-
+    private int bootCount = 0;
+    private int date=0;
     Location gps;
-
     SharedPreferences pref;
     SharedPreferences.Editor editor;
-
     Button button;
     Intent intent;
     ContextAct mConAct;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         //ここから追記
         //レイアウトアイテム取得
         final SeekBar seekM = (SeekBar) findViewById(R.id.seekBar_Meal);
         final TextView Mscoretex = (TextView) findViewById(R.id.Meal_score);
         final ImageView faceScaleImageView = (ImageView) findViewById(R.id.Face_image);
-
         Button btnRecord =findViewById(R.id.btn_record);
         Button btnList =findViewById(R.id.btn_list);
         Button btGraph= findViewById(R.id.btn_graph);
+        TextView textView= (TextView)findViewById(R.id.txt_count);
 
         calendar = Calendar.getInstance();
+        //医師に相談ボタンは起動時押下不可
         button = (Button) findViewById(R.id.btn_consult);
         button.setOnClickListener(btnTap);
         button.setEnabled(false);
-        //デフォルトのSharedPreferencesから保存された"bootCount"を取得
+
+        //医師に相談ボタンを押下可能にするためのログインボーナス
+        //SharedPreferences...データを簡易的に保存することが可能
+        //判別するためのkeyと初期値を設定する...bootcountは日をまたいでアプリを開いた回数
+        //dateは開いた日付
         pref= PreferenceManager.getDefaultSharedPreferences(this);
         bootCount = pref.getInt("bootCount", 1);
-        date = pref.getInt("date", calendar.get(Calendar.MINUTE));
-        Log.d("date ",String.valueOf(date) );
+        date = pref.getInt("date", calendar.get(Calendar.DATE));
+        //アプリが開かれた回数を3桁で0埋めして表示用のTextViewに設定(アプリ右上)
+        textView.setText(String.format("%1$03d", bootCount));
 
         //MainActivityのactivityとcontextを保持するクラスのインスタンス生成
         mConAct = new ContextAct(this, getApplicationContext());
-
-        //画面のインスタンスを取得
-        TextView textView= (TextView)findViewById(R.id.txt_count);
-        //onCreateが呼ばれた回数を3桁で0埋めして表示用のTextViewに設定
-        textView.setText(String.format("%1$03d", bootCount));
 
         //データベース取得
         helper = new com.websarva.wings.android.mealrecord.DataBaseHelper(this);
@@ -98,17 +78,15 @@ public class MainActivity extends AppCompatActivity {
         //シークバー
         Mscoretex.setText("痛み:"+seekM.getProgress());
 
-
-
-
+        //シークバーのリスナー
         seekM.setOnSeekBarChangeListener(
                 new SeekBar.OnSeekBarChangeListener() {
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         //ツマミをドラッグしたときに呼ばれる
-
                         int Mscore;
                         Mscore = seekM.getProgress();
 
+                        //シークバーのスコアに応じて画像を変える
                         if(Mscore >= 0 && Mscore < 20){
                             faceScaleImageView.setImageResource(R.drawable.painf1);
 
@@ -126,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
                         }
 
-
+                        //シークバーの数値をテキストに表示する
                         Mscoretex.setText("痛み:"+seekM.getProgress());
                     }
                     @Override
@@ -142,8 +120,8 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
-        //記録完了ボタン
-        final AlertDialog.Builder RecordconfirmDialog=new AlertDialog.Builder(this);
+        //記録完了ボタンを押したときのダイアログ表示のインスタンス生成
+        final AlertDialog.Builder RecordconfirmDialog = new AlertDialog.Builder(this);
 
         // ダイアログの設定
         RecordconfirmDialog.setTitle(R.string.dialog_title);      //タイトル設定
@@ -163,11 +141,9 @@ public class MainActivity extends AppCompatActivity {
                 int iHour = calendar.get(Calendar.HOUR);
                 int iMinute = calendar.get(Calendar.MINUTE);
                 int iSecond = calendar.get(Calendar.SECOND);
-                //string型に変換
+                //時間をstring型に変換
                 strTime = iHour +":"+iMinute +":"+iSecond;
-                //categoryに満腹度を代入
-                //複数のカテゴリがある場合、レイアウト等から該当するカテゴリを取ってきて代入
-                //シークバーの数値を取ってくる
+                //シークバーのスコア取得
                 score = seekM.getProgress();
 
                 /**
@@ -175,12 +151,12 @@ public class MainActivity extends AppCompatActivity {
                  */
                 MyJobService.schedule();
 
+                //記録時の位置情報取得
                 gps = new LocationService().getLocation();
-
                 lat = (int)(gps.getLatitude()*100);
                 lng = (int)(gps.getLongitude()*100);
 
-                //日付時刻と文字列をデータベースに記録
+                //データベースに記録
                 insertData(db, iYear, iMonth, iDate, strTime, score, lng, lat);
 
                 //完了画面表示
@@ -197,41 +173,40 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        //記録ボタンのリスナー
+        //ダイアログを表示する
         btnRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 RecordconfirmDialog.show();
-
 
             }
         });
 
-
+        //リストボタン押下時の処理
+        //リスト画面に遷移
         btnList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 intent = new Intent(getApplication(), ShowList.class);
                 startActivity(intent);
             }
         });
+
+        //グラフボタン押下時の処理
+        //グラフ画面に遷移
         btGraph.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 intent = new Intent(getApplication(), ShowGraph.class);
                 startActivity(intent);
             }
         });
-
     }
 
-    //データベースに記録する関数
-    //引数は データベース,日付文字列,カテゴリ,数値
-    public void insertData(SQLiteDatabase db, int year, int month, int date, String time, int value, int lng, int lat) {
 
+    //各種データをデータベースに記録する関数...引数は記録するデータ
+    public void insertData(SQLiteDatabase db, int year, int month, int date, String time, int value, int lng, int lat) {
         ContentValues values = new ContentValues();
         values.put("year", year);
         values.put("month", month);
@@ -243,14 +218,16 @@ public class MainActivity extends AppCompatActivity {
 
         db.insert("paindb", null, values);
     }
+
+    //アプリ再開時の処理
     @Override
     protected void onResume() {
         super.onResume();
 
+        //インスタンス生成
         calendar = Calendar.getInstance();
         Resources res = getResources();
         int color = res.getColor(R.color.colorMain);
-
 
         /**
          * calendar.get(Calendar.MINUTE);
@@ -258,9 +235,12 @@ public class MainActivity extends AppCompatActivity {
          * DATEなら1日ごと
          * SECONDなら秒ごと
          */
-        currentdate = calendar.get(Calendar.MINUTE);
-        Log.d("cdate ",String.valueOf(currentdate) );
+        //現在の日にちを取得する
+        currentdate = calendar.get(Calendar.DATE);
 
+        //現在の日にちとSharedpreferencesに保存していたdateを比較
+        //違ったら(=日が進んでいたら)，bootcountを増やして
+        //dateとbootcountを更新する
         if(currentdate != date){
             date = currentdate;
             bootCount +=1;
@@ -269,11 +249,11 @@ public class MainActivity extends AppCompatActivity {
             editor.commit();
 
 
-
             /**
              * if文の条件で右上のカウント数に応じて表示を変える
              */
-            if(bootCount  >1) {
+            //bootcountが一定以上ならば，医師に相談ボタンを押下可能(かつ色変更)にして，ダイアログ表示
+            if(bootCount  > 3) {
                 button.setEnabled(true);
                 new AlertDialog.Builder(this)
                         .setTitle("お知らせ")
@@ -282,8 +262,8 @@ public class MainActivity extends AppCompatActivity {
                         .show();
                 button.setBackgroundColor(color);
 
-
             }else {
+                //一定以下ならば，以下のダイアログ表示(ボタンの色は灰色のまま)
                 new AlertDialog.Builder(this)
                         //.setTitle("title")
                         .setMessage("今日も1日頑張っていきましょう！")
@@ -292,22 +272,19 @@ public class MainActivity extends AppCompatActivity {
                 button.setBackgroundColor(Color.GRAY);
             }
         }
-        //button.setEnabled(false);
-
-
 
         //画面のインスタンスを取得
         TextView textView= (TextView)findViewById(R.id.txt_count);
         //onCreateが呼ばれた回数を3桁で0埋めして表示用のTextViewに設定
         textView.setText(String.format("%1$03d", bootCount));
     }
-    // ボタンAに OnClickListenerを実装する
+    // 医師に相談ボタン押下時の処理
+    //Gmailを開き(変更の可能性あり)，bootcountを0に，ボタンの色を灰色に，ボタンを押下不可にする
     private View.OnClickListener btnTap = new View.OnClickListener() {
 
         // ボタンAクリック時に呼ばれるメソッド
         @Override
         public void onClick(View view) {
-
             String packageName = "com.google.android.gm";
             PackageManager pm = getPackageManager();
             Intent intent = pm.getLaunchIntentForPackage(packageName);
@@ -315,9 +292,6 @@ public class MainActivity extends AppCompatActivity {
             bootCount=0;
             button.setBackgroundColor(Color.GRAY);
             button.setEnabled(false);
-
-
         }
     };
-
 }

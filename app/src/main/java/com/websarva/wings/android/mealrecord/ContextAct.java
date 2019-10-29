@@ -5,7 +5,7 @@ import android.content.Context;
 
 /*******************
  *
- * MainActivityのcontextとactivityを保持するクラス
+ * MainActivity(それ以外でも可)のcontextとactivityを保持するクラス
  * Activityをextendsしていないクラス内メソッドの引数等で
  * アクティビティのcontextやactivityを求められたときに使う
  * staticなのでどこからでも利用可能
