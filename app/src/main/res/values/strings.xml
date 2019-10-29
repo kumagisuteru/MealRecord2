@@ -19,15 +19,25 @@
     <string name="btn_graph">グラフ</string>
     <string name="btn_show">表示</string>
     <string name="btn_summary">まとめ</string>
+    <string name="btn_weekly">週間</string>
+    <string name="btn_oneday">1日</string>
     <string name="btn_consult">医師に相談</string>
     <string name="txt_category">痛み</string>
     <string name="txt_year">年</string>
     <string name="txt_month">月</string>
     <string name="txt_date">日</string>
+    <string name="txt_week">週</string>
     <string name="txt_add_sound">音について</string>
     <string name="txt_add_light">光について</string>
     <string name="toast">データがありません</string>
     <string name="img_trend">img_trend</string>
+    <string-array name="sp_week">
+        <item>1週目</item>
+        <item>2週目</item>
+        <item>3週目</item>
+        <item>4週目</item>
+        <item>5週目</item>
+    </string-array>
     <string-array name="sp_year">
         <item>2019</item>
         <item>2020</item>

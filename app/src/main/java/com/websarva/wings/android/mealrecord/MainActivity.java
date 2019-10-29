@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                 //OKボタン押下時の日付取得
                 calendar = Calendar.getInstance();
                 iYear = calendar.get(Calendar.YEAR);
-                iMonth = calendar.get(Calendar.MONTH);
+                iMonth = calendar.get(Calendar.MONTH)+1;
                 iDate = calendar.get(Calendar.DATE);
                 int iHour = calendar.get(Calendar.HOUR);
                 int iMinute = calendar.get(Calendar.MINUTE);
@@ -176,8 +176,6 @@ public class MainActivity extends AppCompatActivity {
                 MyJobService.schedule();
 
                 gps = new LocationService().getLocation();
-
-
 
                 lat = (int)(gps.getLatitude()*100);
                 lng = (int)(gps.getLongitude()*100);
