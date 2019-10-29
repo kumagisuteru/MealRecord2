@@ -1,6 +1,7 @@
 package com.websarva.wings.android.mealrecord;
 
 import android.util.Log;
+import android.widget.ImageView;
 
 import static com.websarva.wings.android.mealrecord.ShowGraph.imgTrend;
 
@@ -11,13 +12,19 @@ public class TrendDefinition {
     protected static final double BORDER_OF_TREND = 0.2;
 
 
-    protected static void showTrend(int trend){
+    protected static void showTrend(int trend, ImageView img){
         if(trend == INCREASE_TREND){
-            imgTrend.setImageResource(R.drawable.increse);
+            Log.d("increse", String.valueOf(trend));
+            img.setImageDrawable(null);
+            img.setImageResource(R.drawable.increse);
         }else if(trend == STAGNATION_TREND){
-            imgTrend.setImageResource(R.drawable.stagnation);
+            Log.d("stagnant", String.valueOf(trend));
+            img.setImageDrawable(null);
+            img.setImageResource(R.drawable.stagnation);
         }else{
-            imgTrend.setImageResource(R.drawable.decrese);
+            Log.d("decrement", String.valueOf(trend));
+            img.setImageDrawable(null);
+            img.setImageResource(R.drawable.decrese);
         }
     }
 

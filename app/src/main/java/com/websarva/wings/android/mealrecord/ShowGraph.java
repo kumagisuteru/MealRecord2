@@ -87,7 +87,7 @@ public class ShowGraph extends AppCompatActivity {
                 roc = TrendDefinition.calculateRateOfChange(lastweek.value, lastweek.value.length);
                 trend =TrendDefinition.judgeTrend(roc);
             }
-            TrendDefinition.showTrend(trend);
+            TrendDefinition.showTrend(trend,imgTrend);
 
             Log.d("roc", String.valueOf(roc));
             Log.d("trend", String.valueOf(trend));

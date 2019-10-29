@@ -20,6 +20,8 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.util.ArrayList;
 
+import static com.websarva.wings.android.mealrecord.ShowGraph.imgTrend;
+
 public class ShowWeekly extends AppCompatActivity {
     private LineChart mpLineChart;
     com.websarva.wings.android.mealrecord.DataBaseHelper helper;
@@ -106,12 +108,12 @@ public class ShowWeekly extends AppCompatActivity {
                         if (oneweek.value.length < 1) {
                             Toast.makeText(ShowWeekly.this, R.string.toast, Toast.LENGTH_SHORT).show();
                             reload();
-                            //break;
+                            break;
                         } else {
                             roc = TrendDefinition.calculateRateOfChange(oneweek.value, oneweek.value.length);
                             trend = TrendDefinition.judgeTrend(roc);
                         }
-                        TrendDefinition.showTrend(trend);
+                        TrendDefinition.showTrend(trend,imgTrend);
 
                         Log.d("roc", String.valueOf(roc));
                         Log.d("trend", String.valueOf(trend));
@@ -131,6 +133,7 @@ public class ShowWeekly extends AppCompatActivity {
                         Toast.makeText(ShowWeekly.this, R.string.toast, Toast.LENGTH_SHORT).show();
                         reload();
                     }
+                    break;
             }
         }
     };
@@ -144,6 +147,7 @@ public class ShowWeekly extends AppCompatActivity {
             }
         return check;
     }
+
 
     private void reload() {
         intent = getIntent();

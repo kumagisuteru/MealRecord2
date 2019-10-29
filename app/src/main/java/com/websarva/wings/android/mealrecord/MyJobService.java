@@ -117,7 +117,7 @@ public class MyJobService extends JobService {
 */
         calendar = Calendar.getInstance();
         iYear = calendar.get(Calendar.YEAR);
-        iMonth = calendar.get(Calendar.MONTH);
+        iMonth = calendar.get(Calendar.MONTH)+1;
         iDate = calendar.get(Calendar.DATE);
         int iHour = calendar.get(Calendar.HOUR);
         int iMinute = calendar.get(Calendar.MINUTE);

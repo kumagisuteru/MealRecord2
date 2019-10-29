@@ -140,8 +140,8 @@ public class ShowList extends AppCompatActivity {
         Cursor cursor = db.query(
                 "paindb",
                 new String[] { "_id", "year", "month", "date", "time", "value", "longitude", "latitude"},
-                //new String[] {"datetime", "category", "value" },
-                null,
+                "value>0",
+               //null ,
                 //"category=?",
                 null,
                 //new String[]{"Satisfaction"},

@@ -33,7 +33,6 @@ public class ShowOneday extends AppCompatActivity {
     private boolean check = false;
 
     LineDataSet lineDataSet1;
-    LineDataSet lineDataSet2;
 
     GraphSettings settings;
     private Intent intent;
@@ -48,7 +47,7 @@ public class ShowOneday extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_weekly);
+        setContentView(R.layout.activity_show_oneday);
 
         res = getResources();
         int maincolor = res.getColor(R.color.colorMain);
@@ -96,9 +95,9 @@ public class ShowOneday extends AppCompatActivity {
                     String strMonth = (String) spMonth.getSelectedItem();
                     iMonth = Integer.parseInt(strMonth);
                     Log.d("month", String.valueOf(iMonth));
-                    //spDate = findViewById(R.id.sp_date);
+                    spDate = findViewById(R.id.sp_date);
                     String strDate = (String) spDate.getSelectedItem();
-                    iDate = Integer.parseInt(strDate.substring(0, 1));
+                    iDate = Integer.parseInt(strDate);
                     Log.d("date", String.valueOf(iDate));
                     check = checkOnedayEmpty(iYear, iMonth, iDate);
 
@@ -112,7 +111,7 @@ public class ShowOneday extends AppCompatActivity {
                             roc = TrendDefinition.calculateRateOfChange(oneday.value, oneday.value.length);
                             trend = TrendDefinition.judgeTrend(roc);
                         }
-                        TrendDefinition.showTrend(trend);
+                        TrendDefinition.showTrend(trend,imgTrend);
 
                         Log.d("roc", String.valueOf(roc));
                         Log.d("trend", String.valueOf(trend));

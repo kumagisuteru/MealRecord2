@@ -22,8 +22,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static final String DATE = "date";
     private static final String TIME = "time";
     private static final String VALUE = "value";
-
-
     private static final String LONGITUDE = "longitude";
     private static final String LATITUDE = "latitude";
 
@@ -32,7 +30,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     バージョン情報の定数フィールド
      */
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
 
     /*
     コンストラクタ

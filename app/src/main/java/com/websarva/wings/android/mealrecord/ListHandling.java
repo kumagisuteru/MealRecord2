@@ -273,13 +273,7 @@ public class ListHandling {
             Log.d("value", String.valueOf(valuearray[i]));
         }
 
-        if (lineChart.getData() != null &&
-                lineChart.getData().getDataSetCount() > 0) {
-            lineDataSet = (LineDataSet) lineChart.getData().getDataSetByIndex(0);
-            lineDataSet.setValues(values);
-            lineChart.getData().notifyDataChanged();
-            lineChart.notifyDataSetChanged();
-        } else if (!count){
+        if (!count){
             // create a dataset and give it a type
             lineDataSet = new LineDataSet(values, "痛みの強さ");
 
