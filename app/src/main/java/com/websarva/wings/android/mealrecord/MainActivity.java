@@ -158,7 +158,20 @@ public class MainActivity extends AppCompatActivity {
 
                 //データベースに記録
                 insertData(db, iYear, iMonth, iDate, strTime, score, lng, lat);
-
+               /* insertData(db, 2019, 11, 1, "10:10:10", 80, 0, 0);
+                insertData(db, 2019, 11, 2, "10:10:10", 60, 0, 0);
+                insertData(db, 2019, 11, 3, "10:10:10", 65, 0, 0);
+                insertData(db, 2019, 11, 4, "10:10:10", 55, 0, 0);
+                insertData(db, 2019, 11, 5, "10:10:10", 45, 0, 0);
+                insertData(db, 2019, 11, 6, "10:10:10", 60, 0, 0);
+                insertData(db, 2019, 11, 7,"10:10:10", 20, 0, 0);
+                insertData(db, 2019, 11, 8,"10:10:10", 50, 0, 0);
+                insertData(db, 2019, 11, 9, "10:10:10", 80, 0, 0);
+                insertData(db, 2019, 11, 10, "10:10:10", 30, 0, 0);
+                insertData(db, 2019, 11, 11, "10:10:10", 70, 0, 0);
+                insertData(db, 2019, 11, 12, "10:10:10", 55, 0, 0);
+                insertData(db, 2019, 11, 13, "10:10:10", 40, 0, 0);
+*/
                 //完了画面表示
                 Intent intent = new Intent(getApplication(), Recordfin_Activity.class);
                 startActivity(intent);
